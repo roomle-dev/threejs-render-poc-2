@@ -1,16 +1,26 @@
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
-import { Camera, Object3D, Scene, WebGLRenderer } from 'three';
+import {
+  Camera,
+  NeutralToneMapping,
+  Object3D,
+  Scene,
+  WebGLRenderer,
+} from 'three';
 
 export class SceneRendererWebGL implements SceneRenderer {
   private readonly renderer: WebGLRenderer;
   private scene: Scene;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(container: HTMLDivElement) {
     this.renderer = new WebGLRenderer({
-      canvas,
       antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true,
     });
+    this.renderer.toneMapping = NeutralToneMapping;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(this.renderer.domElement);
     this.scene = new Scene();
   }
 
