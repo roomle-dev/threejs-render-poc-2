@@ -1,40 +1,35 @@
 import * as THREE from 'three';
+import { CubeSceneServer } from './scene/cube-scene-server';
 
-// Set up the scene, camera, and renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-const renderer = new THREE.WebGLRenderer({
-  canvas: document.getElementById('canvas') as HTMLCanvasElement,
-});
+export const renderScene = async (canvas: HTMLCanvasElement) => {
+  const sceneServer = new CubeSceneServer();
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.z = 5;
 
-// Set the size of the renderer
-renderer.setSize(window.innerWidth, window.innerHeight);
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-// Add a simple cube to the scene
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+  const sceneObject = await sceneServer.create();
+  scene.add(sceneObject);
 
-// Position the camera
-camera.position.z = 5;
+  function animate() {
+    requestAnimationFrame(animate);
+    sceneObject.rotation.x += 0.01;
+    sceneObject.rotation.y += 0.01;
+    renderer.render(scene, camera);
+  }
 
-// Create the animation loop
-function animate() {
-  requestAnimationFrame(animate);
+  animate();
+};
 
-  // Rotate the cube
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
-  // Render the scene
-  renderer.render(scene, camera);
-}
-
-// Start the animation loop
-animate();
+const canvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+renderScene(canvasElement);
