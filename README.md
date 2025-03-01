@@ -1,1 +1,1 @@
-# threejs-render-poc-2
+# three.js render PoC 2
