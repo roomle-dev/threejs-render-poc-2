@@ -9,7 +9,7 @@
     "serve": "vite preview",
     "format": "prettier --write 'src/**/*.{ts,tsx,html,css}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
-    "ncu": "ncu -u",
+    "ncu": "ncu -u && npm i",
     "lint-serve": "npm run format && npm run lint && npm run build && npm run serve"
   },
   "repository": {
