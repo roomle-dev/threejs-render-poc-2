@@ -8,6 +8,7 @@ import {
   Scene,
   WebGLRenderer,
 } from 'three';
+import { SceneHelperServer } from '@/scene/scene-helper-server';
 
 export class SceneRendererWebGL implements SceneRenderer {
   private readonly renderer: WebGLRenderer;
@@ -49,9 +50,14 @@ export class SceneRendererWebGL implements SceneRenderer {
     return sceneObject;
   }
 
-  public async addLights(LightServer: LightServer): Promise<void> {
-    const lights = await LightServer.create();
+  public async addLights(lightServer: LightServer): Promise<void> {
+    const lights = await lightServer.create();
     lights.forEach((light) => this._scene.add(light));
+  }
+
+  public async addHelper(sceneHelperServer: SceneHelperServer): Promise<void> {
+    const sceneHelpers = await sceneHelperServer.create();
+    sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
   public render(camera: Camera): void {

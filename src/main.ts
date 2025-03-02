@@ -2,14 +2,9 @@ import { CubeSceneServer } from './scene/cube-scene-server';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
-import {
-  AxesHelper,
-  GridHelper,
-  Mesh,
-  PlaneGeometry,
-  ShadowMaterial,
-} from 'three';
 import { AmbientDirectionalLightServer } from './scene/ambient-directional-light-server';
+import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
+import { Mesh, PlaneGeometry, ShadowMaterial } from 'three';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
@@ -22,11 +17,9 @@ export const renderScene = async (container: HTMLDivElement) => {
   );
   const lightServer = new AmbientDirectionalLightServer();
   await renderer.addLights(lightServer);
+  const sceneHelperServer = new AxisGridHelperServer();
+  await renderer.addHelper(sceneHelperServer);
 
-  const gridHelper = new GridHelper(10, 10);
-  renderer.scene.add(gridHelper);
-  const axesHelper = new AxesHelper(2);
-  renderer.scene.add(axesHelper);
   sceneObject.castShadow = true;
   sceneObject.receiveShadow = true;
   sceneObject.position.y = 1.5;
