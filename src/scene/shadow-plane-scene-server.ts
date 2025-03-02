@@ -2,17 +2,27 @@ import {
   Box3,
   Group,
   Mesh,
+  MeshPhysicalMaterial,
   Object3D,
   PlaneGeometry,
   ShadowMaterial,
 } from 'three';
 import { SceneServer } from './scene-server';
 
+export interface ShadowPlaneParameters {
+  usePhysicalMaterial?: boolean;
+}
+
 export class ShadowPlaneSceneServer implements SceneServer {
   private readonly _baseSceneServer: SceneServer;
+  private readonly _shadowPlaneParameters: ShadowPlaneParameters;
 
-  constructor(baseSceneServer: SceneServer) {
+  constructor(
+    baseSceneServer: SceneServer,
+    shadowPlaneParameters: ShadowPlaneParameters
+  ) {
     this._baseSceneServer = baseSceneServer;
+    this._shadowPlaneParameters = shadowPlaneParameters;
   }
 
   async create(): Promise<Object3D[]> {
@@ -45,7 +55,10 @@ export class ShadowPlaneSceneServer implements SceneServer {
   private _newShadowPlane(): Object3D {
     const groundGeometry = new PlaneGeometry(10, 10);
     groundGeometry.rotateX(-Math.PI / 2);
-    const groundMaterial = new ShadowMaterial();
+    // ShadowMaterial is only supported in webgl (three.js 174)
+    const groundMaterial = this._shadowPlaneParameters.usePhysicalMaterial
+      ? new MeshPhysicalMaterial({ color: 0xffffff })
+      : new ShadowMaterial();
     const groundMesh = new Mesh(groundGeometry, groundMaterial);
     groundMesh.receiveShadow = true;
     return groundMesh;

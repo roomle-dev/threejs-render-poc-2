@@ -1,5 +1,4 @@
 import { CubeSceneServer } from './scene/cube-scene-server';
-import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
 import { DefaultLightServer } from './scene/default-light-server';
@@ -8,9 +7,10 @@ import { ShadowModifierServer } from './scene/shadow-modifier-server';
 import { AnimationServer } from './scene/roation-animation-server';
 import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
+import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 
 export const renderScene = async (container: HTMLDivElement) => {
-  const renderer = new SceneRendererWebGL(container);
+  const renderer = new SceneRendererWebGPU(container);
   renderer.setSize(window.innerWidth, window.innerHeight);
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
@@ -25,7 +25,9 @@ export const renderScene = async (container: HTMLDivElement) => {
     baseObjectServer,
     new RotationAnimation()
   );
-  const sceneServer = new ShadowPlaneSceneServer(animationServer);
+  const sceneServer = new ShadowPlaneSceneServer(animationServer, {
+    usePhysicalMaterial: true,
+  });
   await renderer.createNewScene(sceneServer);
 
   window.addEventListener(
