@@ -9,6 +9,7 @@ import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 interface UrlParameters {
   type: string;
@@ -48,6 +49,9 @@ export const renderScene = async (
   });
   await renderer.createNewScene(sceneServer);
 
+  const stats = new Stats();
+  document.body.appendChild(stats.dom);
+
   window.addEventListener(
     'resize',
     () => {
@@ -66,6 +70,7 @@ export const renderScene = async (
     requestAnimationFrame(animate);
     animationServer.animate(deltaTimeMs);
     renderer.render(cameraControl.camera);
+    stats.update();
   };
   animate(0);
 };
