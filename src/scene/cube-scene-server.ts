@@ -6,6 +6,6 @@ export class CubeSceneServer implements SceneServer {
     const geometry = new BoxGeometry();
     const material = new MeshPhysicalMaterial({ color: 0xff0000 });
     const cube = new Mesh(geometry, material);
-    return cube;
+    return Promise.resolve(cube);
   }
 }

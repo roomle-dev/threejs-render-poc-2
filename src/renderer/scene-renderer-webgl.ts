@@ -1,3 +1,4 @@
+import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
 import {
@@ -46,6 +47,11 @@ export class SceneRendererWebGL implements SceneRenderer {
     this._sceneObject = sceneObject;
     this._scene.add(this._sceneObject);
     return sceneObject;
+  }
+
+  public async addLights(LightServer: LightServer): Promise<void> {
+    const lights = await LightServer.create();
+    lights.forEach((light) => this._scene.add(light));
   }
 
   public render(camera: Camera): void {

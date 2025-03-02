@@ -1,3 +1,4 @@
+import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { Camera, Object3D, Scene } from 'three';
 
@@ -6,5 +7,6 @@ export interface SceneRenderer {
   get scene(): Scene;
   setSize(width: number, height: number): void;
   createNewScene(sceneServer: SceneServer): Promise<Object3D>;
+  addLights(LightServer: LightServer): Promise<void>;
   render(camera: Camera): void;
 }

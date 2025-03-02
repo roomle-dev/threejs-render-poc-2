@@ -3,14 +3,13 @@ import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
 import {
-  AmbientLight,
   AxesHelper,
-  DirectionalLight,
   GridHelper,
   Mesh,
   PlaneGeometry,
   ShadowMaterial,
 } from 'three';
+import { AmbientDirectionalLightServer } from './scene/ambient-directional-light-server';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
@@ -21,17 +20,13 @@ export const renderScene = async (container: HTMLDivElement) => {
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
     container
   );
+  const lightServer = new AmbientDirectionalLightServer();
+  await renderer.addLights(lightServer);
 
   const gridHelper = new GridHelper(10, 10);
   renderer.scene.add(gridHelper);
   const axesHelper = new AxesHelper(2);
   renderer.scene.add(axesHelper);
-  const ambientLight = new AmbientLight(0xffffff, 0.5);
-  renderer.scene.add(ambientLight);
-  const directionalLight = new DirectionalLight(0xffffff, 0.5);
-  directionalLight.position.set(5, 15, 5);
-  directionalLight.castShadow = true;
-  renderer.scene.add(directionalLight);
   sceneObject.castShadow = true;
   sceneObject.receiveShadow = true;
   sceneObject.position.y = 1.5;
