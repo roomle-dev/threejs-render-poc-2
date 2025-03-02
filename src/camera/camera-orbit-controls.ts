@@ -3,23 +3,26 @@ import { Camera } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export class CameraOrbitControls implements CameraControl {
-  private baseCamera: CameraControl;
-  private orbitControls: OrbitControls;
+  private _baseCamera: CameraControl;
+  private _orbitControls: OrbitControls;
 
   constructor(baseCamera: CameraControl, domElement: HTMLElement) {
-    this.baseCamera = baseCamera;
-    this.orbitControls = new OrbitControls(this.baseCamera.camera, domElement);
+    this._baseCamera = baseCamera;
+    this._orbitControls = new OrbitControls(
+      this._baseCamera.camera,
+      domElement
+    );
   }
 
   get camera(): Camera {
-    return this.baseCamera.camera;
+    return this._baseCamera.camera;
   }
 
   public setSizes(width: number, height: number): void {
-    this.baseCamera.setSizes(width, height);
+    this._baseCamera.setSizes(width, height);
   }
 
   public update(): void {
-    this.orbitControls.update();
+    this._orbitControls.update();
   }
 }

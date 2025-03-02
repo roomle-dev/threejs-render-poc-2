@@ -10,7 +10,8 @@ import {
 
 export class SceneRendererWebGL implements SceneRenderer {
   private readonly renderer: WebGLRenderer;
-  private scene: Scene;
+  private _scene: Scene;
+  private _sceneObject: Object3D | null = null;
 
   constructor(container: HTMLDivElement) {
     this.renderer = new WebGLRenderer({
@@ -21,11 +22,16 @@ export class SceneRendererWebGL implements SceneRenderer {
     this.renderer.toneMapping = NeutralToneMapping;
     this.renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this.renderer.domElement);
-    this.scene = new Scene();
+    this.renderer.shadowMap.enabled = true;
+    this._scene = new Scene();
   }
 
   get domElement(): HTMLElement {
     return this.renderer.domElement;
+  }
+
+  get scene(): Scene {
+    return this._scene;
   }
 
   public setSize(width: number, height: number): void {
@@ -34,7 +40,11 @@ export class SceneRendererWebGL implements SceneRenderer {
 
   public async createNewScene(sceneServer: SceneServer): Promise<Object3D> {
     const sceneObject = await sceneServer.create();
-    this.scene.add(sceneObject);
+    if (this._sceneObject) {
+      this._scene.remove(this._sceneObject);
+    }
+    this._sceneObject = sceneObject;
+    this._scene.add(this._sceneObject);
     return sceneObject;
   }
 
