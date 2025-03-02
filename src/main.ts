@@ -4,9 +4,9 @@ import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
 import { AmbientDirectionalLightServer } from './scene/ambient-directional-light-server';
 import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
-import { Mesh, PlaneGeometry, ShadowMaterial } from 'three';
 import { ShadowModifierServer } from './scene/shadow-modifier-server';
 import { RotationAnimationServer } from './scene/roation-animation-server';
+import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
@@ -19,18 +19,10 @@ export const renderScene = async (container: HTMLDivElement) => {
   await renderer.addLights(lightServer);
   const sceneHelperServer = new AxisGridHelperServer();
   await renderer.addHelper(sceneHelperServer);
-  const sceneServer = new RotationAnimationServer(
-    new ShadowModifierServer(new CubeSceneServer())
+  const sceneServer = new ShadowPlaneSceneServer(
+    new RotationAnimationServer(new ShadowModifierServer(new CubeSceneServer()))
   );
-  const sceneObject = await renderer.createNewScene(sceneServer);
-
-  sceneObject[0].position.y = 1.5;
-  const groundGeometry = new PlaneGeometry(10, 10);
-  groundGeometry.rotateX(-Math.PI / 2);
-  const groundMaterial = new ShadowMaterial();
-  const groundMesh = new Mesh(groundGeometry, groundMaterial);
-  groundMesh.receiveShadow = true;
-  renderer.scene.add(groundMesh);
+  await renderer.createNewScene(sceneServer);
 
   window.addEventListener(
     'resize',

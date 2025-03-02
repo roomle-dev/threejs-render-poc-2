@@ -13,6 +13,7 @@ export class CubeSceneServer implements SceneServer {
       new MeshPhysicalMaterial({ color: 0xff00ff }), // Magenta
     ];
     const cube = new Mesh(geometry, materials);
+    cube.position.y = 1.5;
     return Promise.resolve([cube]);
   }
 

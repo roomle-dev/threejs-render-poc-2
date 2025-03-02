@@ -11,6 +11,7 @@ export class RotationAnimationServer {
 
   public create() {
     const sceneObjects = this._baseSceneServer.create();
+    this.sceneObjects.length = 0;
     sceneObjects.then((objects) => {
       this.sceneObjects.push(...objects);
     });
