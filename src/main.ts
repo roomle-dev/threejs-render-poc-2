@@ -2,7 +2,7 @@ import { CubeSceneServer } from './scene/cube-scene-server';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
-import { AmbientDirectionalLightServer } from './scene/ambient-directional-light-server';
+import { DefaultLightServer } from './scene/default-light-server';
 import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
 import { ShadowModifierServer } from './scene/shadow-modifier-server';
 import { AnimationServer } from './scene/roation-animation-server';
@@ -16,7 +16,7 @@ export const renderScene = async (container: HTMLDivElement) => {
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
     container
   );
-  const lightServer = new AmbientDirectionalLightServer();
+  const lightServer = new DefaultLightServer();
   await renderer.addLights(lightServer);
   const sceneHelperServer = new AxisGridHelperServer();
   await renderer.addHelper(sceneHelperServer);
