@@ -24,6 +24,10 @@ export class SceneRendererWebGL implements SceneRenderer {
     this.scene = new Scene();
   }
 
+  get domElement(): HTMLElement {
+    return this.renderer.domElement;
+  }
+
   public setSize(width: number, height: number): void {
     this.renderer.setSize(width, height);
   }

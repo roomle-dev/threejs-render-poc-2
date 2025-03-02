@@ -1,14 +1,16 @@
 import { CubeSceneServer } from './scene/cube-scene-server';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
+import { CameraOrbitControls } from './camera/camera-orbit-controls';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
   renderer.setSize(window.innerWidth, window.innerHeight);
   const sceneServer = new CubeSceneServer();
   const sceneObject = await renderer.createNewScene(sceneServer);
-  const cameraControl = new StaticPerspectiveCamera(
-    window.innerWidth / window.innerHeight
+  const cameraControl = new CameraOrbitControls(
+    new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
+    container
   );
 
   window.addEventListener(

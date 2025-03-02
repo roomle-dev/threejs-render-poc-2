@@ -17,4 +17,8 @@ export class StaticPerspectiveCamera implements CameraControl {
     this.cameraObject.aspect = width / height;
     this.cameraObject.updateProjectionMatrix();
   }
+
+  public update(): void {
+    // nothing to do
+  }
 }
