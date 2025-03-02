@@ -5,8 +5,9 @@ import { CameraOrbitControls } from './camera/camera-orbit-controls';
 import { AmbientDirectionalLightServer } from './scene/ambient-directional-light-server';
 import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
 import { ShadowModifierServer } from './scene/shadow-modifier-server';
-import { RotationAnimationServer } from './scene/roation-animation-server';
+import { AnimationServer } from './scene/roation-animation-server';
 import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
+import { RotationAnimation } from './scene/rotation-animation';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
@@ -19,9 +20,12 @@ export const renderScene = async (container: HTMLDivElement) => {
   await renderer.addLights(lightServer);
   const sceneHelperServer = new AxisGridHelperServer();
   await renderer.addHelper(sceneHelperServer);
-  const sceneServer = new ShadowPlaneSceneServer(
-    new RotationAnimationServer(new ShadowModifierServer(new CubeSceneServer()))
+  const baseObjectServer = new ShadowModifierServer(new CubeSceneServer());
+  const animationServer = new AnimationServer(
+    baseObjectServer,
+    new RotationAnimation()
   );
+  const sceneServer = new ShadowPlaneSceneServer(animationServer);
   await renderer.createNewScene(sceneServer);
 
   window.addEventListener(
@@ -40,7 +44,7 @@ export const renderScene = async (container: HTMLDivElement) => {
     const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
     previousTimeStamp = timestamp;
     requestAnimationFrame(animate);
-    sceneServer.animate(deltaTimeMs);
+    animationServer.animate(deltaTimeMs);
     renderer.render(cameraControl.camera);
   };
   requestAnimationFrame(animate);

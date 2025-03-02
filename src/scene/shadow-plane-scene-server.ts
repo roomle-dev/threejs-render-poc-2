@@ -50,8 +50,4 @@ export class ShadowPlaneSceneServer implements SceneServer {
     groundMesh.receiveShadow = true;
     return groundMesh;
   }
-
-  public animate(deltaTimeInMs: number): void {
-    this._baseSceneServer.animate(deltaTimeInMs);
-  }
 }

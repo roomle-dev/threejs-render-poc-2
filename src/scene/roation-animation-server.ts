@@ -1,28 +1,29 @@
-import { Object3D } from 'three';
 import { SceneServer } from './scene-server';
+import { AnimationNode } from './animation-node';
+import { Object3D } from 'three';
 
-export class RotationAnimationServer {
+export class AnimationServer implements SceneServer {
   private readonly _baseSceneServer: SceneServer;
-  private readonly sceneObjects: Object3D[] = [];
+  private readonly _animation: AnimationNode;
+  private readonly _sceneObjects: Object3D[] = [];
 
-  constructor(baseSceneServer: SceneServer) {
+  constructor(baseSceneServer: SceneServer, animation: AnimationNode) {
     this._baseSceneServer = baseSceneServer;
+    this._animation = animation;
   }
 
   public create() {
     const sceneObjects = this._baseSceneServer.create();
-    this.sceneObjects.length = 0;
+    this._sceneObjects.length = 0;
     sceneObjects.then((objects) => {
-      this.sceneObjects.push(...objects);
+      this._sceneObjects.push(...objects);
     });
     return sceneObjects;
   }
 
   public animate(deltaTimeInMs: number): void {
-    this._baseSceneServer.animate(deltaTimeInMs);
-    this.sceneObjects.forEach((object) => {
-      object.rotation.x += (deltaTimeInMs / 1000) * Math.PI;
-      object.rotation.y += (deltaTimeInMs / 1000) * (Math.PI / 2);
+    this._sceneObjects.forEach((object) => {
+      this._animation.animate(object, deltaTimeInMs);
     });
   }
 }

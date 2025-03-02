@@ -22,8 +22,4 @@ export class ShadowModifierServer {
     });
     return sceneObjects;
   }
-
-  public animate(deltaTimeInMs: number): void {
-    this._baseSceneServer.animate(deltaTimeInMs);
-  }
 }
