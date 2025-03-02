@@ -9,7 +9,7 @@ import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
-import Stats from 'three/examples/jsm/libs/stats.module';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 interface UrlParameters {
   type: string;

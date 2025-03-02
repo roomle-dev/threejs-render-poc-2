@@ -6,7 +6,7 @@ import {
   Object3D,
   PlaneGeometry,
   ShadowMaterial,
-} from 'three';
+} from 'three/webgpu';
 import { SceneServer } from './scene-server';
 
 export interface ShadowPlaneParameters {

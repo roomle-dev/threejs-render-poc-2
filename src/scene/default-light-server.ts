@@ -1,5 +1,5 @@
 import { LightServer } from './light-server';
-import { DirectionalLight, HemisphereLight, Light } from 'three';
+import { DirectionalLight, HemisphereLight, Light } from 'three/webgpu';
 
 export class DefaultLightServer implements LightServer {
   public create(): Promise<Light[]> {

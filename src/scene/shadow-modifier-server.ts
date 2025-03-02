@@ -1,4 +1,4 @@
-import { Mesh } from 'three';
+import { Mesh } from 'three/webgpu';
 import { SceneServer } from './scene-server';
 
 export class ShadowModifierServer {

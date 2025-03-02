@@ -1,5 +1,5 @@
 import { CameraControl } from './camera-control';
-import { Camera, PerspectiveCamera } from 'three';
+import { Camera, PerspectiveCamera } from 'three/webgpu';
 
 export class StaticPerspectiveCamera implements CameraControl {
   private _camera: PerspectiveCamera;

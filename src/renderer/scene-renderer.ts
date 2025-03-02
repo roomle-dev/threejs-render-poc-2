@@ -1,7 +1,7 @@
 import { LightServer } from '@/scene/light-server';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
 import { SceneServer } from '@/scene/scene-server';
-import { Camera, Object3D, Scene } from 'three';
+import { Camera, Object3D, Scene } from 'three/webgpu';
 
 export interface SceneRenderer {
   get domElement(): HTMLElement;

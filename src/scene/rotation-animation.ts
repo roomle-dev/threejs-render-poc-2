@@ -1,5 +1,5 @@
 import { AnimationNode } from './animation-node';
-import { Object3D } from 'three';
+import { Object3D } from 'three/webgpu';
 
 export class RotationAnimation implements AnimationNode {
   public animate(object: Object3D, deltaTimeInMs: number): void {

@@ -1,13 +1,8 @@
 import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
-import {
-  Camera,
-  NeutralToneMapping,
-  Object3D,
-  Scene,
-  WebGLRenderer,
-} from 'three';
+import { Camera, NeutralToneMapping, Object3D, Scene } from 'three/webgpu';
+import { WebGLRenderer } from 'three';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
 
 export class SceneRendererWebGL implements SceneRenderer {

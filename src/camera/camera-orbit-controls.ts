@@ -1,6 +1,6 @@
 import { CameraControl } from './camera-control';
-import { Camera } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Camera } from 'three/webgpu';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export class CameraOrbitControls implements CameraControl {
   private _baseCamera: CameraControl;

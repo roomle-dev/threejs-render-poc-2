@@ -1,6 +1,6 @@
 import { SceneServer } from './scene-server';
 import { AnimationNode } from './animation-node';
-import { Object3D } from 'three';
+import { Object3D } from 'three/webgpu';
 
 export class AnimationServer implements SceneServer {
   private readonly _baseSceneServer: SceneServer;

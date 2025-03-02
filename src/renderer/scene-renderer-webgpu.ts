@@ -2,9 +2,7 @@ import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
-import { Camera, NeutralToneMapping, Object3D, Scene } from 'three';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
+import { Camera, NeutralToneMapping, Object3D, Scene } from 'three/webgpu';
 import { WebGPURenderer } from 'three/webgpu';
 
 export class SceneRendererWebGPU implements SceneRenderer {
