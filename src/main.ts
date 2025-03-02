@@ -6,6 +6,7 @@ import { AmbientDirectionalLightServer } from './scene/ambient-directional-light
 import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
 import { Mesh, PlaneGeometry, ShadowMaterial } from 'three';
 import { ShadowModifierServer } from './scene/shadow-modifier-server';
+import { RotationAnimationServer } from './scene/roation-animation-server';
 
 export const renderScene = async (container: HTMLDivElement) => {
   const renderer = new SceneRendererWebGL(container);
@@ -18,7 +19,9 @@ export const renderScene = async (container: HTMLDivElement) => {
   await renderer.addLights(lightServer);
   const sceneHelperServer = new AxisGridHelperServer();
   await renderer.addHelper(sceneHelperServer);
-  const sceneServer = new ShadowModifierServer(new CubeSceneServer());
+  const sceneServer = new RotationAnimationServer(
+    new ShadowModifierServer(new CubeSceneServer())
+  );
   const sceneObject = await renderer.createNewScene(sceneServer);
 
   sceneObject[0].position.y = 1.5;
@@ -40,14 +43,15 @@ export const renderScene = async (container: HTMLDivElement) => {
     false
   );
 
-  const animate = () => {
+  let previousTimeStamp: number | undefined;
+  const animate = (timestamp: number) => {
+    const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
+    previousTimeStamp = timestamp;
     requestAnimationFrame(animate);
-    sceneObject[0].rotation.x += 0.01;
-    sceneObject[0].rotation.y += 0.01;
+    sceneServer.animate(deltaTimeMs);
     renderer.render(cameraControl.camera);
   };
-
-  animate();
+  requestAnimationFrame(animate);
 };
 
 const container = document.getElementById('container') as HTMLDivElement;
