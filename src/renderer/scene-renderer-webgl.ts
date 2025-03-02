@@ -13,7 +13,7 @@ import { SceneHelperServer } from '@/scene/scene-helper-server';
 export class SceneRendererWebGL implements SceneRenderer {
   private readonly renderer: WebGLRenderer;
   private _scene: Scene;
-  private _sceneObject: Object3D | null = null;
+  private _sceneObjects: Object3D[] = [];
 
   constructor(container: HTMLDivElement) {
     this.renderer = new WebGLRenderer({
@@ -40,14 +40,16 @@ export class SceneRendererWebGL implements SceneRenderer {
     this.renderer.setSize(width, height);
   }
 
-  public async createNewScene(sceneServer: SceneServer): Promise<Object3D> {
-    const sceneObject = await sceneServer.create();
-    if (this._sceneObject) {
-      this._scene.remove(this._sceneObject);
+  public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {
+    const sceneObjects = await sceneServer.create();
+    for (const sceneObject of this._sceneObjects) {
+      this._scene.remove(sceneObject);
     }
-    this._sceneObject = sceneObject;
-    this._scene.add(this._sceneObject);
-    return sceneObject;
+    this._sceneObjects = sceneObjects;
+    for (const sceneObject of sceneObjects) {
+      this._scene.add(sceneObject);
+    }
+    return this._sceneObjects;
   }
 
   public async addLights(lightServer: LightServer): Promise<void> {

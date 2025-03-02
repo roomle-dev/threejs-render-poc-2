@@ -1,5 +1,5 @@
 import { Object3D } from 'three';
 
 export interface SceneServer {
-  create(): Promise<Object3D>;
+  create(): Promise<Object3D[]>;
 }

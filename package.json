@@ -10,7 +10,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,html,css}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "ncu": "ncu -u",
-    "lint-and-serve": "npm run format && npm run lint && npm run build && npm run serve"
+    "lint-serve": "npm run format && npm run lint && npm run build && npm run serve"
   },
   "repository": {
     "type": "git",
