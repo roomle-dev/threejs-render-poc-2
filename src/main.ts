@@ -8,9 +8,27 @@ import { AnimationServer } from './scene/roation-animation-server';
 import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
+import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 
-export const renderScene = async (container: HTMLDivElement) => {
-  const renderer = new SceneRendererWebGPU(container);
+interface UrlParameters {
+  type: string;
+}
+
+const queryString = window.location.search;
+const urlSearchParams = new URLSearchParams(queryString);
+const urlParameters: UrlParameters = {
+  type: (urlSearchParams.get('type') as string | undefined) ?? 'webgl',
+};
+const container = document.getElementById('container') as HTMLDivElement;
+
+export const renderScene = async (
+  container: HTMLDivElement,
+  urlParameters: UrlParameters
+) => {
+  const renderer =
+    urlParameters.type === 'webgpu'
+      ? new SceneRendererWebGPU(container)
+      : new SceneRendererWebGL(container);
   renderer.setSize(window.innerWidth, window.innerHeight);
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
@@ -26,7 +44,7 @@ export const renderScene = async (container: HTMLDivElement) => {
     new RotationAnimation()
   );
   const sceneServer = new ShadowPlaneSceneServer(animationServer, {
-    usePhysicalMaterial: true,
+    usePhysicalMaterial: urlParameters.type === 'webgpu',
   });
   await renderer.createNewScene(sceneServer);
 
@@ -49,8 +67,7 @@ export const renderScene = async (container: HTMLDivElement) => {
     animationServer.animate(deltaTimeMs);
     renderer.render(cameraControl.camera);
   };
-  requestAnimationFrame(animate);
+  animate(0);
 };
 
-const container = document.getElementById('container') as HTMLDivElement;
-renderScene(container);
+renderScene(container, urlParameters);
