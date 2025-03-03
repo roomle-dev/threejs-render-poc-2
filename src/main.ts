@@ -23,7 +23,17 @@ const urlParameters: UrlParameters = {
 };
 const container = document.getElementById('container') as HTMLDivElement;
 
-export const renderScene = async (
+const setStatus = (message: string, color: string = '#000000') => {
+  console.log(`Status information: ${message}`);
+  const statusLine = document.getElementById('status-line');
+  if (!statusLine) {
+    return;
+  }
+  statusLine.innerText = message;
+  statusLine.style.setProperty('color', color);
+};
+
+const renderScene = async (
   container: HTMLDivElement,
   urlParameters: UrlParameters
 ) => {
@@ -62,6 +72,7 @@ export const renderScene = async (
   const stats = new Stats();
   document.body.appendChild(stats.dom);
 
+  setStatus(renderer.renderTypeMessage);
   window.addEventListener(
     'resize',
     () => {

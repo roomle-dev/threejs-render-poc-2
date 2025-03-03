@@ -5,6 +5,7 @@ import { Camera, Object3D, Scene } from 'three/webgpu';
 
 export interface SceneRenderer {
   get domElement(): HTMLElement;
+  get renderTypeMessage(): string;
   get scene(): Scene;
   setSize(width: number, height: number): void;
   createNewScene(sceneServer: SceneServer): Promise<Object3D[]>;

@@ -9,6 +9,11 @@ export interface SceneRendererWebGPUParameters {
   forceWebGL?: boolean;
 }
 
+interface BackendType {
+  isWebGPUBackend?: boolean;
+  isWebGLBackend?: boolean;
+}
+
 export class SceneRendererWebGPU implements SceneRenderer {
   private readonly renderer: WebGPURenderer;
   private _scene: Scene;
@@ -30,11 +35,20 @@ export class SceneRendererWebGPU implements SceneRenderer {
     this._scene = new Scene();
   }
 
-  get domElement(): HTMLElement {
+  public get domElement(): HTMLElement {
     return this.renderer.domElement;
   }
 
-  get scene(): Scene {
+  public get renderTypeMessage(): string {
+    return (
+      'WebGPURenderer' +
+      ((this.renderer.backend as BackendType).isWebGPUBackend
+        ? ' (WebGPU)'
+        : ' (WebGL)')
+    );
+  }
+
+  public get scene(): Scene {
     return this._scene;
   }
 

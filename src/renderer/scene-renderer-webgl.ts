@@ -23,11 +23,15 @@ export class SceneRendererWebGL implements SceneRenderer {
     this._scene = new Scene();
   }
 
-  get domElement(): HTMLElement {
+  public get domElement(): HTMLElement {
     return this.renderer.domElement;
   }
 
-  get scene(): Scene {
+  public get renderTypeMessage(): string {
+    return 'WebGLRenderer';
+  }
+
+  public get scene(): Scene {
     return this._scene;
   }
 

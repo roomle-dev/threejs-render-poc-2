@@ -7,3 +7,9 @@ html {
 canvas {
   display: block;
 }
+#status-line {
+  position: absolute;
+  bottom: 20px;
+  left: 100px;
+  font-family: sans-serif;
+}
