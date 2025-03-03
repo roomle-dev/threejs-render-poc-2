@@ -17,4 +17,4 @@ npm run serve
 
 | name | type | description | example |
 |------|------|-------------|---------|
-| `type` | `string` | Renderer type 'webgl' or 'webgpu' (default 'webgl'). | `type=webgpu` |
+| `type` | `string` | Renderer type 'webgl', 'webgpu-forcewebgl', 'webgpu' (default 'webgl'). | `type=webgpu` |

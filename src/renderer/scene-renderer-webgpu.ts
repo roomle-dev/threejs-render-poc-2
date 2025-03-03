@@ -5,15 +5,23 @@ import { SceneHelperServer } from '@/scene/scene-helper-server';
 import { Camera, NeutralToneMapping, Object3D, Scene } from 'three/webgpu';
 import { WebGPURenderer } from 'three/webgpu';
 
+export interface SceneRendererWebGPUParameters {
+  forceWebGL?: boolean;
+}
+
 export class SceneRendererWebGPU implements SceneRenderer {
   private readonly renderer: WebGPURenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
 
-  constructor(container: HTMLDivElement) {
+  constructor(
+    container: HTMLDivElement,
+    parameters: SceneRendererWebGPUParameters = {}
+  ) {
     this.renderer = new WebGPURenderer({
       antialias: true,
       alpha: true,
+      forceWebGL: parameters.forceWebGL ?? false,
     });
     this.renderer.toneMapping = NeutralToneMapping;
     this.renderer.setPixelRatio(window.devicePixelRatio);

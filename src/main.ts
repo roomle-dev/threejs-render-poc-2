@@ -7,6 +7,7 @@ import { ShadowModifierServer } from './scene/shadow-modifier-server';
 import { AnimationServer } from './scene/roation-animation-server';
 import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
+import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -26,10 +27,19 @@ export const renderScene = async (
   container: HTMLDivElement,
   urlParameters: UrlParameters
 ) => {
-  const renderer =
-    urlParameters.type === 'webgpu'
-      ? new SceneRendererWebGPU(container)
-      : new SceneRendererWebGL(container);
+  let renderer: SceneRenderer;
+  switch (urlParameters.type) {
+    default:
+    case 'webgl':
+      renderer = new SceneRendererWebGL(container);
+      break;
+    case 'webgpu':
+      renderer = new SceneRendererWebGPU(container, {});
+      break;
+    case 'webgpu-forcewebgl':
+      renderer = new SceneRendererWebGPU(container, { forceWebGL: true });
+      break;
+  }
   renderer.setSize(window.innerWidth, window.innerHeight);
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
@@ -45,7 +55,7 @@ export const renderScene = async (
     new RotationAnimation()
   );
   const sceneServer = new ShadowPlaneSceneServer(animationServer, {
-    usePhysicalMaterial: urlParameters.type === 'webgpu',
+    usePhysicalMaterial: urlParameters.type !== 'webgl',
   });
   await renderer.createNewScene(sceneServer);
 
