@@ -10,7 +10,15 @@ import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
+import { setupDragDrop } from './util/drag-target';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
+import {
+  DataTexture,
+  EquirectangularReflectionMapping,
+  HemisphereLight,
+} from 'three/webgpu';
 
 interface UrlParameters {
   type: string;
@@ -94,6 +102,45 @@ const renderScene = async (
     stats.update();
   };
   animate(0);
+
+  const setEnvironmentMap = (
+    equirectTexture: DataTexture,
+    _textureData: object
+  ) => {
+    //scene.backgroundBlurriness = 1; // @TODO: Needs PMREM
+    for (const hemisphereLight of renderer.scene.children.filter(
+      (child) => child instanceof HemisphereLight
+    )) {
+      renderer.scene.remove(hemisphereLight);
+    }
+    equirectTexture.mapping = EquirectangularReflectionMapping;
+    renderer.scene.background = equirectTexture;
+    renderer.scene.environment = equirectTexture;
+  };
+  const exrLoader = new EXRLoader();
+  const rgbeLoader = new RGBELoader();
+  const loadResource = (
+    resourceName: string,
+    resource: string | ArrayBuffer | null | undefined
+  ) => {
+    if (typeof resource !== 'string') {
+      console.error('Resource is not a string');
+      return;
+    }
+    const lowerName = resourceName.toLowerCase();
+    if (lowerName.endsWith('.exr')) {
+      exrLoader.load(resource, setEnvironmentMap);
+    } else if (lowerName.endsWith('.hdr')) {
+      rgbeLoader.load(resource, setEnvironmentMap);
+    }
+  };
+  setupDragDrop(
+    'holder',
+    'hover',
+    (file: File, event: ProgressEvent<FileReader>) => {
+      loadResource(file.name, event.target?.result);
+    }
+  );
 };
 
 renderScene(container, urlParameters);
