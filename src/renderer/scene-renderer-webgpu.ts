@@ -52,6 +52,10 @@ export class SceneRendererWebGPU implements SceneRenderer {
     return this._scene;
   }
 
+  public dispose(): void {
+    this.renderer.dispose();
+  }
+
   public setSize(width: number, height: number): void {
     this.renderer.setSize(width, height);
   }

@@ -7,6 +7,7 @@ export interface SceneRenderer {
   get domElement(): HTMLElement;
   get renderTypeMessage(): string;
   get scene(): Scene;
+  dispose(): void;
   setSize(width: number, height: number): void;
   createNewScene(sceneServer: SceneServer): Promise<Object3D[]>;
   addLights(lightServer: LightServer): Promise<void>;
