@@ -6,6 +6,7 @@ import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
 import { ShadowModifierServer } from './scene/shadow-modifier-server';
 import { AnimationServer } from './scene/roation-animation-server';
 import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
+import { GlbSceneServer } from './scene/glb-scene-server';
 import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
@@ -68,7 +69,7 @@ const renderScene = async (
   const sceneHelperServer = new AxisGridHelperServer();
   await renderer.addHelper(sceneHelperServer);
   const baseObjectServer = new ShadowModifierServer(new CubeSceneServer());
-  const animationServer = new AnimationServer(
+  let animationServer: AnimationServer | null = new AnimationServer(
     baseObjectServer,
     new RotationAnimation()
   );
@@ -97,7 +98,7 @@ const renderScene = async (
     const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
     previousTimeStamp = timestamp;
     requestAnimationFrame(animate);
-    animationServer.animate(deltaTimeMs);
+    animationServer?.animate(deltaTimeMs);
     renderer.render(cameraControl.camera);
     stats.update();
   };
@@ -117,6 +118,17 @@ const renderScene = async (
     renderer.scene.background = equirectTexture;
     renderer.scene.environment = equirectTexture;
   };
+  const loadGLTF = async (resource: string) => {
+    const newSceneServer = new ShadowPlaneSceneServer(
+      new ShadowModifierServer(new GlbSceneServer(resource)),
+      {
+        usePhysicalMaterial: urlParameters.type !== 'webgl',
+      }
+    );
+    renderer.createNewScene(newSceneServer).then(() => {
+      animationServer = null;
+    });
+  };
   const exrLoader = new EXRLoader();
   const rgbeLoader = new RGBELoader();
   const loadResource = (
@@ -132,6 +144,8 @@ const renderScene = async (
       exrLoader.load(resource, setEnvironmentMap);
     } else if (lowerName.endsWith('.hdr')) {
       rgbeLoader.load(resource, setEnvironmentMap);
+    } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
+      void loadGLTF(resource);
     }
   };
   setupDragDrop(
