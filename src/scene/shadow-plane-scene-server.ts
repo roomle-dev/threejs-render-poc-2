@@ -6,6 +6,7 @@ import {
   Object3D,
   PlaneGeometry,
   ShadowMaterial,
+  Vector3,
 } from 'three/webgpu';
 import { SceneServer } from './scene-server';
 
@@ -47,8 +48,14 @@ export class ShadowPlaneSceneServer implements SceneServer {
 
   private _liftOnGround(object: Object3D): void {
     const box = new Box3().setFromObject(object);
+    const log10 = Math.floor(Math.log10(Math.abs(box.getSize(new Vector3).length())));
+    const scale = 10 ** -log10;
+    object.scale.multiplyScalar(scale);
+    const boxCenter = box.getCenter(new Vector3);
+    object.position.x -= boxCenter.x * scale;
+    object.position.z -= boxCenter.z * scale;
     if (box.min.y < 0) {
-      object.position.y -= box.min.y;
+      object.position.y -= box.min.y * scale;
     }
   }
 
