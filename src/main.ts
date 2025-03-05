@@ -20,6 +20,8 @@ import {
   EquirectangularReflectionMapping,
   HemisphereLight,
 } from 'three/webgpu';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 interface UrlParameters {
   type: string;
@@ -60,6 +62,13 @@ const renderScene = async (
       break;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const gbLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath('./draco/');
+  dracoLoader.setDecoderConfig({ type: 'wasm' });
+  gbLoader.setDRACOLoader(dracoLoader);
+
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
     container
@@ -120,7 +129,7 @@ const renderScene = async (
   };
   const loadGLTF = async (resource: string) => {
     const newSceneServer = new ShadowPlaneSceneServer(
-      new ShadowModifierServer(new GlbSceneServer(resource)),
+      new ShadowModifierServer(new GlbSceneServer(resource, gbLoader)),
       {
         usePhysicalMaterial: urlParameters.type !== 'webgl',
       }

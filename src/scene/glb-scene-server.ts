@@ -1,21 +1,18 @@
 import { SceneServer } from './scene-server';
 import { Mesh, MeshStandardMaterial, Object3D } from 'three/webgpu';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-//import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 export class GlbSceneServer implements SceneServer {
-  private resource: string;
-  public gltfLoader = new GLTFLoader();
-  //public dracoLoader = new DRACOLoader();
+  private _resource: string;
+  private _gbLoader: GLTFLoader;
 
-  constructor(resource: string) {
-    this.resource = resource;
-    //dracoLoader.setDecoderPath('./draco/');
-    //dracoLoader.setDecoderConfig({ type: 'js' });
+  constructor(resource: string, gbLoader: GLTFLoader) {
+    this._resource = resource;
+    this._gbLoader = gbLoader;
   }
 
   async create(): Promise<Object3D[]> {
-    const glb = await this.gltfLoader.loadAsync(this.resource);
+    const glb = await this._gbLoader.loadAsync(this._resource);
     glb.scene.traverse((child) => {
       if (child instanceof Mesh) {
         if (child.material instanceof MeshStandardMaterial) {
