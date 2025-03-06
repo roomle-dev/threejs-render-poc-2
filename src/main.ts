@@ -86,6 +86,7 @@ const renderScene = async (
     usePhysicalMaterial: urlParameters.type !== 'webgl',
   });
   await renderer.createNewScene(sceneServer);
+  renderer.enableEffects(cameraControl.camera);
 
   const stats = new Stats();
   document.body.appendChild(stats.dom);

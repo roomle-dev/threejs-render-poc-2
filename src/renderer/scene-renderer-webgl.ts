@@ -65,7 +65,12 @@ export class SceneRendererWebGL implements SceneRenderer {
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
-  public render(camera: Camera): void {
+  public enableEffects(_camera: Camera): void {
+    // not yet implemented
+  }
+
+  public render(camera: Camera): Promise<void> {
     this.renderer.render(this.scene, camera);
+    return Promise.resolve();
   }
 }
