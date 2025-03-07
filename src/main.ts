@@ -1,19 +1,16 @@
-import { CubeSceneServer } from './scene/cube-scene-server';
 import { StaticPerspectiveCamera } from './camera/static-perspective-camera';
 import { CameraOrbitControls } from './camera/camera-orbit-controls';
 import { DefaultLightServer } from './scene/default-light-server';
 import { AxisGridHelperServer } from './scene/axis-grid-helper-server';
-import { ShadowModifierServer } from './scene/shadow-modifier-server';
-import { AnimationServer } from './scene/roation-animation-server';
-import { ShadowPlaneSceneServer } from './scene/shadow-plane-scene-server';
-import { GlbSceneServer } from './scene/glb-scene-server';
-import { RotationAnimation } from './scene/rotation-animation';
 import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { setupDragDrop } from './util/drag-target';
-import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import {
+  glbServer,
+  rotatingCubeServer,
+  SceneServerObjects,
+} from './scene/scene-servers';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
   DataTexture,
@@ -22,6 +19,8 @@ import {
 } from 'three/webgpu';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 interface UrlParameters {
   type: string;
@@ -44,12 +43,12 @@ const setStatus = (message: string, color: string = '#000000') => {
   statusLine.style.setProperty('color', color);
 };
 
-const renderScene = async (
-  container: HTMLDivElement,
-  urlParameters: UrlParameters
-) => {
+const newRenderer = async (
+  rendererType: string,
+  container: HTMLDivElement
+): Promise<SceneRenderer> => {
   let renderer: SceneRenderer;
-  switch (urlParameters.type) {
+  switch (rendererType) {
     default:
     case 'webgl':
       renderer = new SceneRendererWebGL(container);
@@ -62,36 +61,43 @@ const renderScene = async (
       break;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
+  await renderer.addLights(new DefaultLightServer());
+  await renderer.addHelper(new AxisGridHelperServer());
+  return renderer;
+};
 
-  const gbLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('./draco/');
-  dracoLoader.setDecoderConfig({ type: 'wasm' });
-  gbLoader.setDRACOLoader(dracoLoader);
-
+const newCameraControl = (container: HTMLDivElement): CameraOrbitControls => {
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
     container
   );
-  const lightServer = new DefaultLightServer();
-  await renderer.addLights(lightServer);
-  const sceneHelperServer = new AxisGridHelperServer();
-  await renderer.addHelper(sceneHelperServer);
-  const baseObjectServer = new ShadowModifierServer(new CubeSceneServer());
-  let animationServer: AnimationServer | null = new AnimationServer(
-    baseObjectServer,
-    new RotationAnimation()
-  );
-  const sceneServer = new ShadowPlaneSceneServer(animationServer, {
-    usePhysicalMaterial: urlParameters.type !== 'webgl',
-  });
-  await renderer.createNewScene(sceneServer);
-  renderer.enableEffects(cameraControl.camera);
+  return cameraControl;
+};
 
-  const stats = new Stats();
-  document.body.appendChild(stats.dom);
+const newAnimationLoop = (
+  renderer: SceneRenderer,
+  cameraControl: CameraOrbitControls,
+  sceneServerObjects: SceneServerObjects,
+  stats: Stats
+) => {
+  let previousTimeStamp: number | undefined;
+  const animate = (timestamp: number = 0) => {
+    const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
+    previousTimeStamp = timestamp;
+    requestAnimationFrame(animate);
+    for (const animationServer of sceneServerObjects.animationServer) {
+      animationServer.animate(deltaTimeMs);
+    }
+    renderer.render(cameraControl.camera);
+    stats.update();
+  };
+  return animate;
+};
 
-  setStatus(renderer.renderTypeMessage);
+const addResizeEventListener = (
+  cameraControl: CameraOrbitControls,
+  renderer: SceneRenderer
+) => {
   window.addEventListener(
     'resize',
     () => {
@@ -102,43 +108,100 @@ const renderScene = async (
     },
     false
   );
+};
 
-  let previousTimeStamp: number | undefined;
-  const animate = (timestamp: number) => {
-    const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
-    previousTimeStamp = timestamp;
-    requestAnimationFrame(animate);
-    animationServer?.animate(deltaTimeMs);
-    renderer.render(cameraControl.camera);
-    stats.update();
-  };
-  animate(0);
+const setEnvironmentMap = (
+  renderer: SceneRenderer,
+  equirectTexture: DataTexture,
+  _textureData: object
+) => {
+  //scene.backgroundBlurriness = 1; // @TODO: Needs PMREM
+  for (const hemisphereLight of renderer.scene.children.filter(
+    (child) => child instanceof HemisphereLight
+  )) {
+    renderer.scene.remove(hemisphereLight);
+  }
+  equirectTexture.mapping = EquirectangularReflectionMapping;
+  renderer.scene.background = equirectTexture;
+  renderer.scene.environment = equirectTexture;
+};
 
-  const setEnvironmentMap = (
-    equirectTexture: DataTexture,
-    _textureData: object
-  ) => {
-    //scene.backgroundBlurriness = 1; // @TODO: Needs PMREM
-    for (const hemisphereLight of renderer.scene.children.filter(
-      (child) => child instanceof HemisphereLight
-    )) {
-      renderer.scene.remove(hemisphereLight);
-    }
-    equirectTexture.mapping = EquirectangularReflectionMapping;
-    renderer.scene.background = equirectTexture;
-    renderer.scene.environment = equirectTexture;
-  };
-  const loadGLTF = async (resource: string) => {
-    const newSceneServer = new ShadowPlaneSceneServer(
-      new ShadowModifierServer(new GlbSceneServer(resource, gbLoader)),
-      {
-        usePhysicalMaterial: urlParameters.type !== 'webgl',
-      }
+const loadExr = (
+  renderer: SceneRenderer,
+  resource: string,
+  exrLoader: EXRLoader
+) => {
+  exrLoader.load(resource, (texture, textureData) =>
+    setEnvironmentMap(renderer, texture, textureData)
+  );
+};
+
+const loadHdr = (
+  renderer: SceneRenderer,
+  resource: string,
+  hdrLoader: RGBELoader
+) => {
+  hdrLoader.load(resource, (texture, textureData) =>
+    setEnvironmentMap(renderer, texture, textureData)
+  );
+};
+
+const newGlbLoader = (): GLTFLoader => {
+  const gbLoader = new GLTFLoader();
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath('./draco/');
+  dracoLoader.setDecoderConfig({ type: 'wasm' });
+  gbLoader.setDRACOLoader(dracoLoader);
+  return gbLoader;
+};
+
+const loadGlb = async (
+  renderer: SceneRenderer,
+  resource: string,
+  gbLoader: GLTFLoader,
+  sceneServerObjects: SceneServerObjects
+) => {
+  const newSceneServerObjects = glbServer(
+    urlParameters.type,
+    resource,
+    gbLoader
+  );
+  renderer.createNewScene(newSceneServerObjects.sceneServer).then(() => {
+    sceneServerObjects.sceneServer = newSceneServerObjects.sceneServer;
+    sceneServerObjects.animationServer.length = 0;
+    sceneServerObjects.animationServer.push(
+      ...newSceneServerObjects.animationServer
     );
-    renderer.createNewScene(newSceneServer).then(() => {
-      animationServer = null;
-    });
-  };
+  });
+};
+
+const newStats = (renderer: SceneRenderer): Stats => {
+  const stats = new Stats();
+  document.body.appendChild(stats.dom);
+  setStatus(renderer.renderTypeMessage);
+  return stats;
+};
+
+const renderScene = async (
+  container: HTMLDivElement,
+  urlParameters: UrlParameters
+) => {
+  const renderer = await newRenderer(urlParameters.type, container);
+  const cameraControl = newCameraControl(container);
+  const sceneServerObjects = rotatingCubeServer(urlParameters.type);
+  await renderer.createNewScene(sceneServerObjects.sceneServer);
+  renderer.enableEffects(cameraControl.camera);
+  const stats = newStats(renderer);
+  addResizeEventListener(cameraControl, renderer);
+  const animate = newAnimationLoop(
+    renderer,
+    cameraControl,
+    sceneServerObjects,
+    stats
+  );
+  animate();
+
+  const gbLoader = newGlbLoader();
   const exrLoader = new EXRLoader();
   const rgbeLoader = new RGBELoader();
   const loadResource = (
@@ -151,11 +214,11 @@ const renderScene = async (
     }
     const lowerName = resourceName.toLowerCase();
     if (lowerName.endsWith('.exr')) {
-      exrLoader.load(resource, setEnvironmentMap);
+      loadExr(renderer, resource, exrLoader);
     } else if (lowerName.endsWith('.hdr')) {
-      rgbeLoader.load(resource, setEnvironmentMap);
+      loadHdr(renderer, resource, rgbeLoader);
     } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
-      void loadGLTF(resource);
+      void loadGlb(renderer, resource, gbLoader, sceneServerObjects);
     }
   };
   setupDragDrop(

@@ -6,25 +6,25 @@ import { WebGLRenderer } from 'three';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
 
 export class SceneRendererWebGL implements SceneRenderer {
-  private readonly renderer: WebGLRenderer;
+  private _renderer: WebGLRenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
 
   constructor(container: HTMLDivElement) {
-    this.renderer = new WebGLRenderer({
+    this._renderer = new WebGLRenderer({
       antialias: true,
       alpha: true,
       preserveDrawingBuffer: true,
     });
-    this.renderer.toneMapping = NeutralToneMapping;
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(this.renderer.domElement);
-    this.renderer.shadowMap.enabled = true;
+    this._renderer.toneMapping = NeutralToneMapping;
+    this._renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(this._renderer.domElement);
+    this._renderer.shadowMap.enabled = true;
     this._scene = new Scene();
   }
 
   public get domElement(): HTMLElement {
-    return this.renderer.domElement;
+    return this._renderer.domElement;
   }
 
   public get renderTypeMessage(): string {
@@ -36,11 +36,11 @@ export class SceneRendererWebGL implements SceneRenderer {
   }
 
   public dispose(): void {
-    this.renderer.dispose();
+    this._renderer.dispose();
   }
 
   public setSize(width: number, height: number): void {
-    this.renderer.setSize(width, height);
+    this._renderer.setSize(width, height);
   }
 
   public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {
@@ -70,7 +70,7 @@ export class SceneRendererWebGL implements SceneRenderer {
   }
 
   public render(camera: Camera): Promise<void> {
-    this.renderer.render(this.scene, camera);
+    this._renderer.render(this.scene, camera);
     return Promise.resolve();
   }
 }

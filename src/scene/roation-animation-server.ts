@@ -2,7 +2,7 @@ import { SceneServer } from './scene-server';
 import { AnimationNode } from './animation-node';
 import { Object3D } from 'three/webgpu';
 
-export class AnimationServer implements SceneServer {
+export class AnimationServer implements SceneServer, AnimationServer {
   private readonly _baseSceneServer: SceneServer;
   private readonly _animation: AnimationNode;
   private readonly _sceneObjects: Object3D[] = [];

@@ -37,7 +37,7 @@ interface BackendType {
 }
 
 export class SceneRendererWebGPU implements SceneRenderer {
-  private readonly renderer: WebGPURenderer;
+  private _renderer: WebGPURenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
   private _postProcessing?: PostProcessing;
@@ -47,26 +47,26 @@ export class SceneRendererWebGPU implements SceneRenderer {
     container: HTMLDivElement,
     parameters: SceneRendererWebGPUParameters = {}
   ) {
-    this.renderer = new WebGPURenderer({
+    this._renderer = new WebGPURenderer({
       antialias: true,
       alpha: true,
       forceWebGL: parameters.forceWebGL ?? false,
     });
-    this.renderer.toneMapping = NeutralToneMapping;
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(this.renderer.domElement);
-    this.renderer.shadowMap.enabled = true;
+    this._renderer.toneMapping = NeutralToneMapping;
+    this._renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(this._renderer.domElement);
+    this._renderer.shadowMap.enabled = true;
     this._scene = new Scene();
   }
 
   public get domElement(): HTMLElement {
-    return this.renderer.domElement;
+    return this._renderer.domElement;
   }
 
   public get renderTypeMessage(): string {
     return (
       'WebGPURenderer' +
-      ((this.renderer.backend as BackendType).isWebGPUBackend
+      ((this._renderer.backend as BackendType).isWebGPUBackend
         ? ' (WebGPU)'
         : ' (WebGL)')
     );
@@ -77,11 +77,12 @@ export class SceneRendererWebGPU implements SceneRenderer {
   }
 
   public dispose(): void {
-    this.renderer.dispose();
+    this._renderer.dispose();
+    this._postProcessing?.dispose();
   }
 
   public setSize(width: number, height: number): void {
-    this.renderer.setSize(width, height);
+    this._renderer.setSize(width, height);
   }
 
   public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {
@@ -108,7 +109,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
 
   public enableEffects(_camera: Camera): void {
     // https://tympanus.net/codrops/2024/10/30/interactive-3d-with-three-js-batchedmesh-and-webgpurenderer/
-    this._postProcessing = new PostProcessing(this.renderer as Renderer);
+    this._postProcessing = new PostProcessing(this._renderer as Renderer);
 
     this._effectController = {
       focus: uniform(32.0),
@@ -160,7 +161,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
     if (this._postProcessing) {
       await this._postProcessing.renderAsync();
     } else {
-      await this.renderer.renderAsync(this.scene, camera);
+      await this._renderer.renderAsync(this.scene, camera);
     }
   }
 }
