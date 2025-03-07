@@ -22,6 +22,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { TslEffectsTest } from './renderer/tsl-effects-test';
+import { GUI } from 'dat.gui';
 
 interface UrlParameters {
   type: string;
@@ -46,9 +47,11 @@ const renderScene = async (
     urlParameters.type === 'webgpu' ||
     urlParameters.type === 'webgpu-forcewebgl'
   ) {
-    renderer.addEffects(cameraControl.camera, new TslEffectsTest());
+    renderer.addEffects(new TslEffectsTest());
   }
   const stats = newStats(renderer);
+  const gui = new GUI();
+  renderer.updateUi(gui);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(
     renderer,

@@ -3,6 +3,7 @@ import { SceneHelperServer } from '@/scene/scene-helper-server';
 import { SceneServer } from '@/scene/scene-server';
 import { RenderEffects } from './render-effects';
 import { Camera, Object3D, Scene } from 'three/webgpu';
+import { GUI } from 'dat.gui';
 
 export interface SceneRenderer {
   get domElement(): HTMLElement;
@@ -13,6 +14,7 @@ export interface SceneRenderer {
   createNewScene(sceneServer: SceneServer): Promise<Object3D[]>;
   addLights(lightServer: LightServer): Promise<void>;
   addHelper(sceneHelperServer: SceneHelperServer): Promise<void>;
-  addEffects(camera: Camera, renderEffects: RenderEffects): void;
+  addEffects(renderEffects: RenderEffects): void;
   render(camera: Camera): Promise<void>;
+  updateUi(gui: GUI): void;
 }

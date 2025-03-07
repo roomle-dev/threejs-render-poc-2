@@ -10,6 +10,7 @@ import {
   Scene,
   WebGPURenderer,
 } from 'three/webgpu';
+import { GUI } from 'dat.gui';
 
 export interface SceneRendererWebGPUParameters {
   forceWebGL?: boolean;
@@ -20,11 +21,17 @@ interface BackendType {
   isWebGLBackend?: boolean;
 }
 
+interface UiProperties {
+  'enable effects': true;
+}
+
 export class SceneRendererWebGPU implements SceneRenderer {
   private _renderer: WebGPURenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
   private _renderEffects?: RenderEffects;
+  private _effectsNeedUpdate: boolean = false;
+  private _uiProperties: UiProperties = { 'enable effects': true };
 
   constructor(
     container: HTMLDivElement,
@@ -90,16 +97,29 @@ export class SceneRendererWebGPU implements SceneRenderer {
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
-  public addEffects(camera: Camera, renderEffects: RenderEffects): void {
+  public addEffects(renderEffects: RenderEffects): void {
+    this._effectsNeedUpdate = true;
     this._renderEffects = renderEffects;
-    this._renderEffects.initialize(this._renderer, this._scene, camera);
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (this._renderEffects) {
+    if (this._renderEffects && this._uiProperties['enable effects']) {
+      if (this._effectsNeedUpdate) {
+        this._effectsNeedUpdate = false;
+        this._renderEffects.initialize(this._renderer, this._scene, camera);
+        if (this._scene.environment) {
+          this._scene.environment.needsUpdate = true;
+        }
+      }
       await this._renderEffects.renderAsync();
     } else {
       await this._renderer.renderAsync(this.scene, camera);
     }
+  }
+
+  public updateUi(gui: GUI): void {
+    gui
+      .add(this._uiProperties, 'enable effects')
+      .onChange(() => (this._effectsNeedUpdate = true));
   }
 }
