@@ -2,30 +2,14 @@ import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
+import { RenderEffects } from './render-effects';
 import {
   Camera,
   NeutralToneMapping,
   Object3D,
-  PostProcessing,
-  Renderer,
   Scene,
-  UniformNode,
+  WebGPURenderer,
 } from 'three/webgpu';
-import { WebGPURenderer } from 'three/webgpu';
-import {
-  clamp,
-  mrt,
-  NodeRepresentation,
-  output,
-  pass,
-  ShaderNodeObject,
-  transformedNormalView,
-  uniform,
-  viewportUV,
-} from 'three/tsl';
-import { ao } from 'three/examples/jsm/tsl/display/GTAONode.js';
-import { dof } from 'three/examples/jsm/tsl/display/DepthOfFieldNode.js';
-import { fxaa } from 'three/examples/jsm/tsl/display/FXAANode.js';
 
 export interface SceneRendererWebGPUParameters {
   forceWebGL?: boolean;
@@ -40,8 +24,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
   private _renderer: WebGPURenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
-  private _postProcessing?: PostProcessing;
-  private _effectController?: Record<string, NodeRepresentation>;
+  private _renderEffects?: RenderEffects;
 
   constructor(
     container: HTMLDivElement,
@@ -78,7 +61,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
 
   public dispose(): void {
     this._renderer.dispose();
-    this._postProcessing?.dispose();
+    this._renderEffects?.dispose();
   }
 
   public setSize(width: number, height: number): void {
@@ -107,59 +90,14 @@ export class SceneRendererWebGPU implements SceneRenderer {
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
-  public enableEffects(_camera: Camera): void {
-    // https://tympanus.net/codrops/2024/10/30/interactive-3d-with-three-js-batchedmesh-and-webgpurenderer/
-    this._postProcessing = new PostProcessing(this._renderer as Renderer);
-
-    this._effectController = {
-      focus: uniform(32.0),
-      aperture: uniform(100),
-      maxblur: uniform(0.005),
-    };
-
-    const scenePass = pass(this.scene, _camera);
-    scenePass.setMRT(
-      mrt({
-        output: output,
-        normal: transformedNormalView,
-      })
-    );
-
-    const scenePassColor = scenePass.getTextureNode('output');
-    const scenePassNormal = scenePass.getTextureNode('normal');
-    const scenePassDepth = scenePass.getTextureNode('depth');
-
-    const aoPass = ao(scenePassDepth, scenePassNormal, _camera);
-    aoPass.distanceExponent.value = 1;
-    aoPass.distanceFallOff.value = 0.1;
-    aoPass.radius.value = 0.1;
-    aoPass.scale.value = 1.5;
-    aoPass.thickness.value = 1;
-
-    const blendPassAO = aoPass.getTextureNode().mul(scenePassColor);
-    const scenePassViewZ = scenePass.getViewZNode();
-    const dofPass = dof(
-      blendPassAO,
-      scenePassViewZ,
-      this._effectController.focus,
-      (
-        this._effectController.aperture as ShaderNodeObject<UniformNode<number>>
-      ).mul(0.00001),
-      this._effectController.maxblur
-    );
-    const vignetteFactor = clamp(
-      viewportUV.sub(0.5).length().mul(1.2),
-      0.0,
-      1.0
-    )
-      .oneMinus()
-      .pow(0.5);
-    this._postProcessing.outputNode = fxaa(dofPass.mul(vignetteFactor));
+  public addEffects(camera: Camera, renderEffects: RenderEffects): void {
+    this._renderEffects = renderEffects;
+    this._renderEffects.initialize(this._renderer, this._scene, camera);
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (this._postProcessing) {
-      await this._postProcessing.renderAsync();
+    if (this._renderEffects) {
+      await this._renderEffects.renderAsync();
     } else {
       await this._renderer.renderAsync(this.scene, camera);
     }

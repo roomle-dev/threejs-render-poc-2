@@ -4,6 +4,7 @@ import { SceneRenderer } from './scene-renderer';
 import { Camera, NeutralToneMapping, Object3D, Scene } from 'three/webgpu';
 import { WebGLRenderer } from 'three';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
+import { RenderEffects } from './render-effects';
 
 export class SceneRendererWebGL implements SceneRenderer {
   private _renderer: WebGLRenderer;
@@ -65,7 +66,7 @@ export class SceneRendererWebGL implements SceneRenderer {
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
-  public enableEffects(_camera: Camera): void {
+  public addEffects(_camera: Camera, _renderEffects: RenderEffects): void {
     // not yet implemented
   }
 

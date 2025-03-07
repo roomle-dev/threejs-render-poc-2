@@ -21,6 +21,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { TslEffectsTest } from './renderer/tsl-effects-test';
 
 interface UrlParameters {
   type: string;
@@ -32,6 +33,59 @@ const urlParameters: UrlParameters = {
   type: (urlSearchParams.get('type') as string | undefined) ?? 'webgl',
 };
 const container = document.getElementById('container') as HTMLDivElement;
+
+const renderScene = async (
+  container: HTMLDivElement,
+  urlParameters: UrlParameters
+) => {
+  const renderer = await newRenderer(urlParameters.type, container);
+  const cameraControl = newCameraControl(container);
+  const sceneServerObjects = rotatingCubeServer(urlParameters.type);
+  await renderer.createNewScene(sceneServerObjects.sceneServer);
+  if (
+    urlParameters.type === 'webgpu' ||
+    urlParameters.type === 'webgpu-forcewebgl'
+  ) {
+    renderer.addEffects(cameraControl.camera, new TslEffectsTest());
+  }
+  const stats = newStats(renderer);
+  addResizeEventListener(cameraControl, renderer);
+  const animate = newAnimationLoop(
+    renderer,
+    cameraControl,
+    sceneServerObjects,
+    stats
+  );
+  animate();
+
+  const gbLoader = newGlbLoader();
+  const exrLoader = new EXRLoader();
+  const rgbeLoader = new RGBELoader();
+  const loadResource = (
+    resourceName: string,
+    resource: string | ArrayBuffer | null | undefined
+  ) => {
+    if (typeof resource !== 'string') {
+      console.error('Resource is not a string');
+      return;
+    }
+    const lowerName = resourceName.toLowerCase();
+    if (lowerName.endsWith('.exr')) {
+      loadExr(renderer, resource, exrLoader);
+    } else if (lowerName.endsWith('.hdr')) {
+      loadHdr(renderer, resource, rgbeLoader);
+    } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
+      void loadGlb(renderer, resource, gbLoader, sceneServerObjects);
+    }
+  };
+  setupDragDrop(
+    'holder',
+    'hover',
+    (file: File, event: ProgressEvent<FileReader>) => {
+      loadResource(file.name, event.target?.result);
+    }
+  );
+};
 
 const setStatus = (message: string, color: string = '#000000') => {
   console.log(`Status information: ${message}`);
@@ -180,54 +234,6 @@ const newStats = (renderer: SceneRenderer): Stats => {
   document.body.appendChild(stats.dom);
   setStatus(renderer.renderTypeMessage);
   return stats;
-};
-
-const renderScene = async (
-  container: HTMLDivElement,
-  urlParameters: UrlParameters
-) => {
-  const renderer = await newRenderer(urlParameters.type, container);
-  const cameraControl = newCameraControl(container);
-  const sceneServerObjects = rotatingCubeServer(urlParameters.type);
-  await renderer.createNewScene(sceneServerObjects.sceneServer);
-  renderer.enableEffects(cameraControl.camera);
-  const stats = newStats(renderer);
-  addResizeEventListener(cameraControl, renderer);
-  const animate = newAnimationLoop(
-    renderer,
-    cameraControl,
-    sceneServerObjects,
-    stats
-  );
-  animate();
-
-  const gbLoader = newGlbLoader();
-  const exrLoader = new EXRLoader();
-  const rgbeLoader = new RGBELoader();
-  const loadResource = (
-    resourceName: string,
-    resource: string | ArrayBuffer | null | undefined
-  ) => {
-    if (typeof resource !== 'string') {
-      console.error('Resource is not a string');
-      return;
-    }
-    const lowerName = resourceName.toLowerCase();
-    if (lowerName.endsWith('.exr')) {
-      loadExr(renderer, resource, exrLoader);
-    } else if (lowerName.endsWith('.hdr')) {
-      loadHdr(renderer, resource, rgbeLoader);
-    } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
-      void loadGlb(renderer, resource, gbLoader, sceneServerObjects);
-    }
-  };
-  setupDragDrop(
-    'holder',
-    'hover',
-    (file: File, event: ProgressEvent<FileReader>) => {
-      loadResource(file.name, event.target?.result);
-    }
-  );
 };
 
 renderScene(container, urlParameters);
