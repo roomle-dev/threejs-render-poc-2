@@ -51,7 +51,7 @@ const renderScene = async (
   }
   const stats = newStats(renderer);
   const gui = new GUI();
-  renderer.updateUi(gui);
+  renderer.addUI(gui);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(
     renderer,

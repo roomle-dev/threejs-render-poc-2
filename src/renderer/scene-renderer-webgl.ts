@@ -76,7 +76,7 @@ export class SceneRendererWebGL implements SceneRenderer {
     return Promise.resolve();
   }
 
-  public updateUi(_gui: GUI): void {
+  public addUI(_gui: GUI): void {
     // not yet implemented
   }
 }

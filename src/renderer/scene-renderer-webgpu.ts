@@ -117,9 +117,10 @@ export class SceneRendererWebGPU implements SceneRenderer {
     }
   }
 
-  public updateUi(gui: GUI): void {
+  public addUI(gui: GUI): void {
     gui
       .add(this._uiProperties, 'enable effects')
       .onChange(() => (this._effectsNeedUpdate = true));
+    this._renderEffects?.addUI(gui);
   }
 }
