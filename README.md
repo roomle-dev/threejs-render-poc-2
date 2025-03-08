@@ -22,3 +22,7 @@ npm run serve
 ## Notes
 
 [Notes and ideas](./docs/notes.md)
+
+## Links
+
+[Three.js Shading Language](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)
