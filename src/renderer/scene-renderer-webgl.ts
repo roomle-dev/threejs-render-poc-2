@@ -11,6 +11,9 @@ export class SceneRendererWebGL implements SceneRenderer {
   private _renderer: WebGLRenderer;
   private _scene: Scene;
   private _sceneObjects: Object3D[] = [];
+  private _renderEffects?: RenderEffects;
+  private _effectsNeedUpdate: boolean = false;
+  private _cameraHasChanged: boolean = false;
 
   constructor(container: HTMLDivElement) {
     this._renderer = new WebGLRenderer({
@@ -67,17 +70,32 @@ export class SceneRendererWebGL implements SceneRenderer {
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 
-  public addEffects(_renderEffects: RenderEffects): void {
-    // not yet implemented
+  public addEffects(renderEffects: RenderEffects): void {
+    this._effectsNeedUpdate = true;
+    this._renderEffects = renderEffects;
   }
 
   public cameraHasChanged(): void {
-    // not yet implemented
+    this._cameraHasChanged = true;
   }
 
-  public render(camera: Camera): Promise<void> {
-    this._renderer.render(this.scene, camera);
-    return Promise.resolve();
+  public async render(camera: Camera): Promise<void> {
+    if (this._renderEffects?.isValid) {
+      if (this._effectsNeedUpdate) {
+        this._effectsNeedUpdate = false;
+        this._renderEffects.updateScene(this._renderer, this._scene, camera);
+        if (this._scene.environment) {
+          this._scene.environment.needsUpdate = true;
+        }
+      }
+      if (this._cameraHasChanged) {
+        this._cameraHasChanged = false;
+        this._renderEffects.updateCamera(this._renderer, this._scene, camera);
+      }
+      await this._renderEffects.renderAsync();
+    } else {
+      this._renderer.render(this.scene, camera);
+    }
   }
 
   public addUI(_gui: GUI): void {

@@ -51,6 +51,10 @@ export class TslEffectsTest implements RenderEffects {
     thickness: 1,
   };
 
+  get isValid(): boolean {
+    return true;
+  }
+
   public dispose(): void {
     this._postProcessing?.dispose();
   }
@@ -99,7 +103,7 @@ export class TslEffectsTest implements RenderEffects {
     this._postProcessing.outputNode = fxaa(dofPass.mul(vignetteFactor));
   }
 
-  public update(renderer: Renderer, scene: Scene, camera: Camera): void {
+  public updateScene(renderer: Renderer, scene: Scene, camera: Camera): void {
     if (!this._postProcessing) {
       this.initialize(renderer, scene, camera);
     }
@@ -107,6 +111,14 @@ export class TslEffectsTest implements RenderEffects {
       this._scenePass.scene = scene;
       this._scenePass.camera = camera;
     }
+  }
+
+  public updateCamera(
+    _renderer: Renderer,
+    _scene: Scene,
+    _camera: Camera
+  ): void {
+    // nothing to do
   }
 
   public async renderAsync() {

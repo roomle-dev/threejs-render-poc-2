@@ -23,6 +23,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { TslEffectsTest } from './renderer/tsl-effects-test';
 import { GUI } from 'dat.gui';
+import { WebGLPathTracer } from './renderer/webgl-path-tracer';
 
 interface UrlParameters {
   type: string;
@@ -48,6 +49,8 @@ const renderScene = async (
     urlParameters.type === 'webgpu-forcewebgl'
   ) {
     renderer.addEffects(new TslEffectsTest());
+  } else if (urlParameters.type === 'webgl') {
+    renderer.addEffects(new WebGLPathTracer());
   }
   const stats = newStats(renderer);
   const gui = new GUI();

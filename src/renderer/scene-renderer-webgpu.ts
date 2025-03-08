@@ -31,6 +31,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
   private _sceneObjects: Object3D[] = [];
   private _renderEffects?: RenderEffects;
   private _effectsNeedUpdate: boolean = false;
+  private _cameraHasChanged: boolean = false;
   private _uiProperties: UiProperties = { 'enable effects': true };
 
   constructor(
@@ -103,17 +104,21 @@ export class SceneRendererWebGPU implements SceneRenderer {
   }
 
   public cameraHasChanged(): void {
-    // not yet implemented
+    this._cameraHasChanged = true;
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (this._renderEffects && this._uiProperties['enable effects']) {
+    if (this._renderEffects?.isValid && this._uiProperties['enable effects']) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;
-        this._renderEffects.update(this._renderer, this._scene, camera);
+        this._renderEffects.updateScene(this._renderer, this._scene, camera);
         if (this._scene.environment) {
           this._scene.environment.needsUpdate = true;
         }
+      }
+      if (this._cameraHasChanged) {
+        this._cameraHasChanged = false;
+        this._renderEffects.updateCamera(this._renderer, this._scene, camera);
       }
       await this._renderEffects.renderAsync();
     } else {
