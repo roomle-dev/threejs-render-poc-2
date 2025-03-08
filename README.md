@@ -18,3 +18,7 @@ npm run serve
 | name | type | description | example |
 |------|------|-------------|---------|
 | `type` | `string` | Renderer type 'webgl', 'webgpu-forcewebgl', 'webgpu' (default 'webgl'). | `type=webgpu` |
+
+## Notes
+
+[Notes and ideas](./docs/notes.md)

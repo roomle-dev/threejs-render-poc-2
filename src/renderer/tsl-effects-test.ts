@@ -102,30 +102,6 @@ export class TslEffectsTest implements RenderEffects {
   }
 
   public addUI(gui: GUI): void {
-    const dofFolder = gui.addFolder('depth of field');
-    dofFolder.add(this._uiProperties, 'focus', 0, 100, 1).onChange((value) => {
-      (
-        this._effectController?.focus as ShaderNodeObject<UniformNode<number>>
-      ).value = value;
-    });
-    dofFolder
-      .add(this._uiProperties, 'aperture', 0, 100, 1)
-      .onChange((value) => {
-        (
-          this._effectController?.aperture as ShaderNodeObject<
-            UniformNode<number>
-          >
-        ).value = value;
-      });
-    dofFolder
-      .add(this._uiProperties, 'maxblur', 0, 0.02, 0.0001)
-      .onChange((value) => {
-        (
-          this._effectController?.maxblur as ShaderNodeObject<
-            UniformNode<number>
-          >
-        ).value = value;
-      });
     const aoFolder = gui.addFolder('ambient occlusion');
     aoFolder
       .add(this._uiProperties, 'distanceExponent', 0, 2, 0.1)
@@ -157,6 +133,30 @@ export class TslEffectsTest implements RenderEffects {
         if (this._aoPass) {
           this._aoPass.thickness.value = value;
         }
+      });
+    const dofFolder = gui.addFolder('depth of field');
+    dofFolder.add(this._uiProperties, 'focus', 0, 100, 1).onChange((value) => {
+      (
+        this._effectController?.focus as ShaderNodeObject<UniformNode<number>>
+      ).value = value;
+    });
+    dofFolder
+      .add(this._uiProperties, 'aperture', 0, 100, 1)
+      .onChange((value) => {
+        (
+          this._effectController?.aperture as ShaderNodeObject<
+            UniformNode<number>
+          >
+        ).value = value;
+      });
+    dofFolder
+      .add(this._uiProperties, 'maxblur', 0, 0.02, 0.0001)
+      .onChange((value) => {
+        (
+          this._effectController?.maxblur as ShaderNodeObject<
+            UniformNode<number>
+          >
+        ).value = value;
       });
   }
 }
