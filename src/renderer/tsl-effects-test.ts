@@ -1,6 +1,7 @@
 import { RenderEffects } from './render-effects';
 import {
   Camera,
+  PassNode,
   PostProcessing,
   Renderer,
   Scene,
@@ -37,6 +38,7 @@ interface UiProperties {
 export class TslEffectsTest implements RenderEffects {
   private _postProcessing?: PostProcessing;
   private _effectController?: Record<string, NodeRepresentation>;
+  private _scenePass?: ShaderNodeObject<PassNode>;
   private _aoPass?: ShaderNodeObject<GTAONode>;
   private _uiProperties: UiProperties = {
     focus: 32.0,
@@ -95,6 +97,16 @@ export class TslEffectsTest implements RenderEffects {
       .oneMinus()
       .pow(0.5);
     this._postProcessing.outputNode = fxaa(dofPass.mul(vignetteFactor));
+  }
+
+  public update(renderer: Renderer, scene: Scene, camera: Camera): void {
+    if (!this._postProcessing) {
+      this.initialize(renderer, scene, camera);
+    }
+    if (this._scenePass) {
+      this._scenePass.scene = scene;
+      this._scenePass.camera = camera;
+    }
   }
 
   public async renderAsync() {

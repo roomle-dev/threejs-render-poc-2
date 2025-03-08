@@ -106,7 +106,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
     if (this._renderEffects && this._uiProperties['enable effects']) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;
-        this._renderEffects.initialize(this._renderer, this._scene, camera);
+        this._renderEffects.update(this._renderer, this._scene, camera);
         if (this._scene.environment) {
           this._scene.environment.needsUpdate = true;
         }

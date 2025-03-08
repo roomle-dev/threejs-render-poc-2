@@ -4,6 +4,7 @@ import { GUI } from 'dat.gui';
 export interface RenderEffects {
   dispose(): void;
   initialize(renderer: Renderer, scene: Scene, camera: Camera): void;
+  update(renderer: Renderer, scene: Scene, camera: Camera): void;
   renderAsync(): Promise<void>;
   addUI(gui: GUI): void;
 }
