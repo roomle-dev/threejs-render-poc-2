@@ -85,6 +85,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
     for (const sceneObject of sceneObjects) {
       this._scene.add(sceneObject);
     }
+    this._effectsNeedUpdate = true;
     return this._sceneObjects;
   }
 

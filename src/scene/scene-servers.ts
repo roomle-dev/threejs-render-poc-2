@@ -32,7 +32,7 @@ export const glbServer = (
   const sceneServer = new ShadowPlaneSceneServer(
     new ShadowModifierServer(new GlbSceneServer(resource, gbLoader)),
     {
-      usePhysicalMaterial: sceneType !== 'webgl',
+      usePhysicalMaterial: true,
     }
   );
   return { sceneServer, animationServer: [] };

@@ -23,7 +23,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { TslEffectsTest } from './renderer/tsl-effects-test';
 import { GUI } from 'dat.gui';
-import { WebGLPathTracer } from './renderer/webgl-path-tracer';
+import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 
 interface UrlParameters {
   type: string;
@@ -50,7 +50,7 @@ const renderScene = async (
   ) {
     renderer.addEffects(new TslEffectsTest());
   } else if (urlParameters.type === 'webgl') {
-    renderer.addEffects(new WebGLPathTracer());
+    renderer.addEffects(new WebGLPathTracerEffect());
   }
   const stats = newStats(renderer);
   const gui = new GUI();

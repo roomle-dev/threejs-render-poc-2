@@ -25,4 +25,5 @@ npm run serve
 
 ## Links
 
-[Three.js Shading Language](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)
+[Three.js Shading Language](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)  
+[three-gpu-pathtracer](https://github.com/gkjohnson/three-gpu-pathtracer)  
