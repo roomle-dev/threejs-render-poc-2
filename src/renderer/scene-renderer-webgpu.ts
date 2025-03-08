@@ -102,6 +102,10 @@ export class SceneRendererWebGPU implements SceneRenderer {
     this._renderEffects = renderEffects;
   }
 
+  public cameraHasChanged(): void {
+    // not yet implemented
+  }
+
   public async render(camera: Camera): Promise<void> {
     if (this._renderEffects && this._uiProperties['enable effects']) {
       if (this._effectsNeedUpdate) {

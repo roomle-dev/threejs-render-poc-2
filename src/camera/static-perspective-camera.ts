@@ -21,4 +21,8 @@ export class StaticPerspectiveCamera implements CameraControl {
   public update(): void {
     // nothing to do
   }
+
+  public addCameraChangedListener(_callback: () => void): void {
+    // not yet implemented
+  }
 }

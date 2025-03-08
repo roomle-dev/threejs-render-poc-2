@@ -71,6 +71,10 @@ export class SceneRendererWebGL implements SceneRenderer {
     // not yet implemented
   }
 
+  public cameraHasChanged(): void {
+    // not yet implemented
+  }
+
   public render(camera: Camera): Promise<void> {
     this._renderer.render(this.scene, camera);
     return Promise.resolve();

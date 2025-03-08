@@ -40,7 +40,7 @@ const renderScene = async (
   urlParameters: UrlParameters
 ) => {
   const renderer = await newRenderer(urlParameters.type, container);
-  const cameraControl = newCameraControl(container);
+  const cameraControl = newCameraControl(container, renderer);
   const sceneServerObjects = rotatingCubeServer(urlParameters.type);
   await renderer.createNewScene(sceneServerObjects.sceneServer);
   if (
@@ -123,11 +123,15 @@ const newRenderer = async (
   return renderer;
 };
 
-const newCameraControl = (container: HTMLDivElement): CameraOrbitControls => {
+const newCameraControl = (
+  container: HTMLDivElement,
+  renderer: SceneRenderer
+): CameraOrbitControls => {
   const cameraControl = new CameraOrbitControls(
     new StaticPerspectiveCamera(window.innerWidth / window.innerHeight),
     container
   );
+  cameraControl.addCameraChangedListener(() => renderer.cameraHasChanged());
   return cameraControl;
 };
 

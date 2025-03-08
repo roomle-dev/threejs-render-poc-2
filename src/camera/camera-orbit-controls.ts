@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 export class CameraOrbitControls implements CameraControl {
   private _baseCamera: CameraControl;
   private _orbitControls: OrbitControls;
+  private _onCameraChangedCallbacks: (() => void)[] = [];
 
   constructor(baseCamera: CameraControl, domElement: HTMLElement) {
     this._baseCamera = baseCamera;
@@ -12,6 +13,9 @@ export class CameraOrbitControls implements CameraControl {
       this._baseCamera.camera,
       domElement
     );
+    this._orbitControls.addEventListener('change', () => {
+      this._onCameraChangedCallbacks.forEach((callback) => callback());
+    });
   }
 
   get camera(): Camera {
@@ -24,5 +28,9 @@ export class CameraOrbitControls implements CameraControl {
 
   public update(): void {
     this._orbitControls.update();
+  }
+
+  public addCameraChangedListener(callback: () => void): void {
+    this._onCameraChangedCallbacks.push(callback);
   }
 }

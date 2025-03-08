@@ -15,6 +15,7 @@ export interface SceneRenderer {
   addLights(lightServer: LightServer): Promise<void>;
   addHelper(sceneHelperServer: SceneHelperServer): Promise<void>;
   addEffects(renderEffects: RenderEffects): void;
+  cameraHasChanged(): void;
   render(camera: Camera): Promise<void>;
   addUI(gui: GUI): void;
 }

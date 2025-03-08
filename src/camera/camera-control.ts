@@ -4,4 +4,5 @@ export interface CameraControl {
   get camera(): Camera;
   setSizes(width: number, height: number): void;
   update(): void;
+  addCameraChangedListener(callback: () => void): void;
 }
