@@ -27,6 +27,12 @@ export class WebGLPathTracerEffect implements RenderEffects {
     return true;
   }
 
+  get renderStatusMessage(): string {
+    return this._pathTracer
+      ? `WebGL Path Tracer samples ${Math.floor(this._pathTracer.samples)}`
+      : '#';
+  }
+
   public dispose(): void {
     this._pathTracer?.dispose();
   }

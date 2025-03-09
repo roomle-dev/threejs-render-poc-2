@@ -7,7 +7,7 @@ import { GUI } from 'dat.gui';
 
 export interface SceneRenderer {
   get domElement(): HTMLElement;
-  get renderTypeMessage(): string;
+  get renderStatusMessage(): string;
   get scene(): Scene;
   dispose(): void;
   setSize(width: number, height: number): void;

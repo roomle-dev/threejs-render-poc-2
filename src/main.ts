@@ -52,7 +52,7 @@ const renderScene = async (
   } else if (urlParameters.type === 'webgl') {
     renderer.addEffects(new WebGLPathTracerEffect());
   }
-  const stats = newStats(renderer);
+  const stats = newStats();
   const gui = new GUI();
   renderer.addUI(gui);
   addResizeEventListener(cameraControl, renderer);
@@ -93,8 +93,14 @@ const renderScene = async (
   );
 };
 
-const setStatus = (message: string, color: string = '#000000') => {
-  console.log(`Status information: ${message}`);
+const setStatus = (
+  message: string,
+  color: string = '#000000',
+  log: boolean = true
+) => {
+  if (log) {
+    console.log(`Status information: ${message}`);
+  }
   const statusLine = document.getElementById('status-line');
   if (!statusLine) {
     return;
@@ -154,6 +160,7 @@ const newAnimationLoop = (
     }
     renderer.render(cameraControl.camera);
     stats.update();
+    setStatus(renderer.renderStatusMessage, '#000000', false);
   };
   return animate;
 };
@@ -239,10 +246,9 @@ const loadGlb = async (
   });
 };
 
-const newStats = (renderer: SceneRenderer): Stats => {
+const newStats = (): Stats => {
   const stats = new Stats();
   document.body.appendChild(stats.dom);
-  setStatus(renderer.renderTypeMessage);
   return stats;
 };
 

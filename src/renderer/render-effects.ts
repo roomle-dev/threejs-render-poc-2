@@ -4,6 +4,7 @@ import { GUI } from 'dat.gui';
 
 export interface RenderEffects {
   get isValid(): boolean;
+  get renderStatusMessage(): string;
   dispose(): void;
   initialize(
     renderer: Renderer | WebGLRenderer,

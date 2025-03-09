@@ -55,6 +55,10 @@ export class TslEffectsTest implements RenderEffects {
     return true;
   }
 
+  get renderStatusMessage(): string {
+    return 'TSL Effects Test';
+  }
+
   public dispose(): void {
     this._postProcessing?.dispose();
     this._scenePass?.dispose();

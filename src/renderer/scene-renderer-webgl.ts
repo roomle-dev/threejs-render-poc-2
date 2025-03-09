@@ -37,8 +37,18 @@ export class SceneRendererWebGL implements SceneRenderer {
     return this._renderer.domElement;
   }
 
-  public get renderTypeMessage(): string {
-    return 'WebGLRenderer';
+  public get effectsEnabled(): boolean {
+    return (
+      (this._renderEffects?.isValid ?? false) &&
+      this._uiProperties['enable path tracer']
+    );
+  }
+
+  public get renderStatusMessage(): string {
+    const effectsMessage = this.effectsEnabled
+      ? this._renderEffects?.renderStatusMessage
+      : '';
+    return 'WebGLRenderer ' + effectsMessage;
   }
 
   public get scene(): Scene {
@@ -88,10 +98,7 @@ export class SceneRendererWebGL implements SceneRenderer {
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (
-      this._renderEffects?.isValid &&
-      this._uiProperties['enable path tracer']
-    ) {
+    if (this.effectsEnabled && this._renderEffects) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;
         this._renderEffects.updateScene(this._renderer, this._scene, camera);

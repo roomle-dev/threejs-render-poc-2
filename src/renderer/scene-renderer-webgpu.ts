@@ -54,12 +54,24 @@ export class SceneRendererWebGPU implements SceneRenderer {
     return this._renderer.domElement;
   }
 
-  public get renderTypeMessage(): string {
+  public get effectsEnabled(): boolean {
+    return (
+      (this._renderEffects?.isValid ?? false) &&
+      this._uiProperties['enable effects']
+    );
+  }
+
+  public get renderStatusMessage(): string {
+    const effectsMessage = this.effectsEnabled
+      ? this._renderEffects?.renderStatusMessage
+      : '';
     return (
       'WebGPURenderer' +
       ((this._renderer.backend as BackendType).isWebGPUBackend
         ? ' (WebGPU)'
-        : ' (WebGL)')
+        : ' (WebGL)') +
+      ' ' +
+      effectsMessage
     );
   }
 
@@ -110,7 +122,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (this._renderEffects?.isValid && this._uiProperties['enable effects']) {
+    if (this.effectsEnabled && this._renderEffects) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;
         this._renderEffects.updateScene(this._renderer, this._scene, camera);
