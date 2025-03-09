@@ -5,10 +5,11 @@ import { GUI } from 'dat.gui';
 import { WebGLRenderer } from 'three';
 
 interface UiProperties {
-  toneMapping: boolean;
+  enable: boolean;
   pause: boolean;
   tiles: number;
-  transparentBackground: boolean;
+  filterGlossyFactor: number;
+  minSamples: number;
   resolutionScale: number;
 }
 
@@ -16,11 +17,12 @@ interface UiProperties {
 export class WebGLPathTracerEffect implements RenderEffects {
   private _pathTracer?: WebGLPathTracer;
   private _uiProperties: UiProperties = {
-    toneMapping: true,
+    enable: true,
     pause: false,
     tiles: 3,
-    transparentBackground: false,
+    filterGlossyFactor: 1,
     resolutionScale: 1,
+    minSamples: 3,
   };
 
   get isValid(): boolean {
@@ -43,8 +45,8 @@ export class WebGLPathTracerEffect implements RenderEffects {
     camera: Camera
   ): void {
     this._pathTracer = new WebGLPathTracer(renderer);
-    this._pathTracer.filterGlossyFactor = 1;
-    this._pathTracer.minSamples = 3;
+    this._pathTracer.filterGlossyFactor = this._uiProperties.filterGlossyFactor;
+    this._pathTracer.minSamples = this._uiProperties.minSamples;
     this._pathTracer.renderScale = this._uiProperties.resolutionScale;
     this._pathTracer.tiles.set(
       this._uiProperties.tiles,
@@ -78,13 +80,34 @@ export class WebGLPathTracerEffect implements RenderEffects {
     if (!this._pathTracer) {
       return Promise.resolve();
     }
-    this._pathTracer.enablePathTracing = true;
-    this._pathTracer.pausePathTracing = false;
+    this._pathTracer.enablePathTracing = this._uiProperties.enable;
+    this._pathTracer.pausePathTracing = this._uiProperties.pause;
     this._pathTracer.renderSample();
     return Promise.resolve();
   }
 
-  public addUI(_gui: GUI): void {
-    // ...
+  public addUI(gui: GUI): void {
+    const pathTracerFolder = gui.addFolder('path tracer');
+    pathTracerFolder.add(this._uiProperties, 'enable');
+    pathTracerFolder.add(this._uiProperties, 'pause');
+    pathTracerFolder
+      .add(this._uiProperties, 'tiles', 1, 10, 1)
+      .onChange((value) => {
+        this._pathTracer?.tiles.set(value, value);
+      });
+    pathTracerFolder
+      .add(this._uiProperties, 'filterGlossyFactor', 0, 10, 0.1)
+      .onChange((value) => {
+        if (this._pathTracer) {
+          this._pathTracer.filterGlossyFactor = value;
+        }
+      });
+    pathTracerFolder
+      .add(this._uiProperties, 'resolutionScale', 0.1, 1, 0.1)
+      .onChange((value) => {
+        if (this._pathTracer) {
+          this._pathTracer.renderScale = value;
+        }
+      });
   }
 }

@@ -8,6 +8,7 @@ import {
   NeutralToneMapping,
   Object3D,
   Scene,
+  Texture,
   WebGPURenderer,
 } from 'three/webgpu';
 import { GUI } from 'dat.gui';
@@ -100,6 +101,12 @@ export class SceneRendererWebGPU implements SceneRenderer {
     }
     this._effectsNeedUpdate = true;
     return this._sceneObjects;
+  }
+
+  public setEnvironmentMap(equirectTexture: Texture): void {
+    this._scene.background = equirectTexture;
+    this._scene.environment = equirectTexture;
+    this._effectsNeedUpdate = true;
   }
 
   public async addLights(lightServer: LightServer): Promise<void> {

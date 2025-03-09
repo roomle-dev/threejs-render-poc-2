@@ -193,8 +193,7 @@ const setEnvironmentMap = (
     renderer.scene.remove(hemisphereLight);
   }
   equirectTexture.mapping = EquirectangularReflectionMapping;
-  renderer.scene.background = equirectTexture;
-  renderer.scene.environment = equirectTexture;
+  renderer.setEnvironmentMap(equirectTexture);
 };
 
 const loadExr = (

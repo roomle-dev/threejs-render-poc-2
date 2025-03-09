@@ -1,7 +1,13 @@
 import { LightServer } from '@/scene/light-server';
 import { SceneServer } from '@/scene/scene-server';
 import { SceneRenderer } from './scene-renderer';
-import { Camera, NeutralToneMapping, Object3D, Scene } from 'three/webgpu';
+import {
+  Camera,
+  NeutralToneMapping,
+  Object3D,
+  Scene,
+  Texture,
+} from 'three/webgpu';
 import { WebGLRenderer } from 'three';
 import { SceneHelperServer } from '@/scene/scene-helper-server';
 import { RenderEffects } from './render-effects';
@@ -78,9 +84,16 @@ export class SceneRendererWebGL implements SceneRenderer {
     return this._sceneObjects;
   }
 
+  public setEnvironmentMap(equirectTexture: Texture): void {
+    this._scene.background = equirectTexture;
+    this._scene.environment = equirectTexture;
+    this._effectsNeedUpdate = true;
+  }
+
   public async addLights(lightServer: LightServer): Promise<void> {
     const lights = await lightServer.create();
     lights.forEach((light) => this._scene.add(light));
+    this._effectsNeedUpdate = true;
   }
 
   public async addHelper(sceneHelperServer: SceneHelperServer): Promise<void> {
