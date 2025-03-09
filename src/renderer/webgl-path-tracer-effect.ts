@@ -28,7 +28,7 @@ export class WebGLPathTracerEffect implements RenderEffects {
   }
 
   public dispose(): void {
-    // ...
+    this._pathTracer?.dispose();
   }
 
   public initialize(

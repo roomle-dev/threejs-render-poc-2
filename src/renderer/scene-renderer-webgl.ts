@@ -7,6 +7,10 @@ import { SceneHelperServer } from '@/scene/scene-helper-server';
 import { RenderEffects } from './render-effects';
 import { GUI } from 'dat.gui';
 
+interface UiProperties {
+  'enable path tracer': true;
+}
+
 export class SceneRendererWebGL implements SceneRenderer {
   private _renderer: WebGLRenderer;
   private _scene: Scene;
@@ -14,6 +18,7 @@ export class SceneRendererWebGL implements SceneRenderer {
   private _renderEffects?: RenderEffects;
   private _effectsNeedUpdate: boolean = false;
   private _cameraHasChanged: boolean = false;
+  private _uiProperties: UiProperties = { 'enable path tracer': true };
 
   constructor(container: HTMLDivElement) {
     this._renderer = new WebGLRenderer({
@@ -42,10 +47,12 @@ export class SceneRendererWebGL implements SceneRenderer {
 
   public dispose(): void {
     this._renderer.dispose();
+    this._renderEffects?.dispose();
   }
 
   public setSize(width: number, height: number): void {
     this._renderer.setSize(width, height);
+    this._effectsNeedUpdate = true;
   }
 
   public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {
@@ -81,7 +88,10 @@ export class SceneRendererWebGL implements SceneRenderer {
   }
 
   public async render(camera: Camera): Promise<void> {
-    if (this._renderEffects?.isValid) {
+    if (
+      this._renderEffects?.isValid &&
+      this._uiProperties['enable path tracer']
+    ) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;
         this._renderEffects.updateScene(this._renderer, this._scene, camera);
@@ -99,7 +109,10 @@ export class SceneRendererWebGL implements SceneRenderer {
     }
   }
 
-  public addUI(_gui: GUI): void {
-    // not yet implemented
+  public addUI(gui: GUI): void {
+    gui
+      .add(this._uiProperties, 'enable path tracer')
+      .onChange(() => (this._effectsNeedUpdate = true));
+    this._renderEffects?.addUI(gui);
   }
 }

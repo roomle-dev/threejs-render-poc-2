@@ -57,6 +57,8 @@ export class TslEffectsTest implements RenderEffects {
 
   public dispose(): void {
     this._postProcessing?.dispose();
+    this._scenePass?.dispose();
+    this._aoPass?.dispose();
   }
 
   public initialize(renderer: Renderer, scene: Scene, camera: Camera) {

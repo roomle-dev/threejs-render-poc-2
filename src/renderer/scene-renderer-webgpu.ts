@@ -74,6 +74,7 @@ export class SceneRendererWebGPU implements SceneRenderer {
 
   public setSize(width: number, height: number): void {
     this._renderer.setSize(width, height);
+    this._effectsNeedUpdate = true;
   }
 
   public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {

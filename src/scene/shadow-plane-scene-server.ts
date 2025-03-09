@@ -67,7 +67,12 @@ export class ShadowPlaneSceneServer implements SceneServer {
     // ShadowMaterial is only supported in webgl (three.js 174)
     // ShadowMaterial is all over black with webgl path tracer (three-gpu-pathtracer 0.0.23)
     const groundMaterial = this._shadowPlaneParameters.usePhysicalMaterial
-      ? new MeshPhysicalMaterial({ color: 0xffffff })
+      ? new MeshPhysicalMaterial({
+          color: 0xffffff,
+          metalness: 0.0,
+          roughness: 0.2,
+          reflectivity: 0.8,
+        })
       : new ShadowMaterial();
     const groundMesh = new Mesh(groundGeometry, groundMaterial);
     groundMesh.receiveShadow = true;
