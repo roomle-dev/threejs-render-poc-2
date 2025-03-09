@@ -1,3 +1,5 @@
+import { newRadialFloorTexture } from '../texture/texture-factory';
+import { SceneServer } from './scene-server';
 import {
   Box3,
   Group,
@@ -8,7 +10,6 @@ import {
   ShadowMaterial,
   Vector3,
 } from 'three/webgpu';
-import { SceneServer } from './scene-server';
 
 export interface ShadowPlaneParameters {
   usePhysicalMaterial?: boolean;
@@ -62,7 +63,7 @@ export class ShadowPlaneSceneServer implements SceneServer {
   }
 
   private _newShadowPlane(): Object3D {
-    const groundGeometry = new PlaneGeometry(10, 10);
+    const groundGeometry = new PlaneGeometry(20, 20);
     groundGeometry.rotateX(-Math.PI / 2);
     // ShadowMaterial is only supported in webgl (three.js 174)
     // ShadowMaterial is all over black with webgl path tracer (three-gpu-pathtracer 0.0.23)
@@ -72,6 +73,8 @@ export class ShadowPlaneSceneServer implements SceneServer {
           metalness: 0.0,
           roughness: 0.2,
           reflectivity: 0.8,
+          transparent: true,
+          map: newRadialFloorTexture(1024),
         })
       : new ShadowMaterial();
     const groundMesh = new Mesh(groundGeometry, groundMaterial);

@@ -12,14 +12,14 @@ export interface SceneServerObjects {
   animationServer: AnimationServer[];
 }
 
-export const rotatingCubeServer = (sceneType: string): SceneServerObjects => {
+export const rotatingCubeServer = (_sceneType: string): SceneServerObjects => {
   const baseObjectServer = new ShadowModifierServer(new CubeSceneServer());
   const animationServer: AnimationServer | null = new AnimationServer(
     baseObjectServer,
     new RotationAnimation()
   );
   const sceneServer = new ShadowPlaneSceneServer(animationServer, {
-    usePhysicalMaterial: sceneType !== 'webgl',
+    usePhysicalMaterial: true,
   });
   return { sceneServer, animationServer: [animationServer] };
 };
