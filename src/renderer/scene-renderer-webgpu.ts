@@ -80,6 +80,12 @@ export class SceneRendererWebGPU implements SceneRenderer {
     return this._scene;
   }
 
+  set sceneHasChanged(value: boolean) {
+    if (value) {
+      this._effectsNeedUpdate = true;
+    }
+  }
+
   public dispose(): void {
     this._renderer.dispose();
     this._renderEffects?.dispose();

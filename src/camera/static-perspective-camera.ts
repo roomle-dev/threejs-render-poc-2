@@ -5,7 +5,7 @@ export class StaticPerspectiveCamera implements CameraControl {
   private _camera: PerspectiveCamera;
 
   constructor(aspect: number) {
-    this._camera = new PerspectiveCamera(75, aspect, 0.1, 20);
+    this._camera = new PerspectiveCamera(75, aspect, 0.1, 40);
     this._camera.position.set(0, 3, 5);
   }
 

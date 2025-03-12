@@ -13,6 +13,7 @@ import {
 } from './scene/scene-servers';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
+  Color,
   DataTexture,
   EquirectangularReflectionMapping,
   HemisphereLight,
@@ -54,7 +55,7 @@ const renderScene = async (
   }
   const stats = newStats();
   const gui = new GUI();
-  renderer.addUI(gui);
+  addGui(gui, renderer);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(
     renderer,
@@ -187,11 +188,6 @@ const setEnvironmentMap = (
   _textureData: object
 ) => {
   //scene.backgroundBlurriness = 1; // @TODO: Needs PMREM
-  for (const hemisphereLight of renderer.scene.children.filter(
-    (child) => child instanceof HemisphereLight
-  )) {
-    renderer.scene.remove(hemisphereLight);
-  }
   equirectTexture.mapping = EquirectangularReflectionMapping;
   renderer.setEnvironmentMap(equirectTexture);
 };
@@ -249,6 +245,61 @@ const newStats = (): Stats => {
   const stats = new Stats();
   document.body.appendChild(stats.dom);
   return stats;
+};
+
+const addGui = (gui: GUI, renderer: SceneRenderer) => {
+  renderer.addUI(gui);
+  for (const hemisphereLight of renderer.scene.children.filter(
+    (child) => child instanceof HemisphereLight
+  )) {
+    addHemisphereLightGui(gui, renderer, hemisphereLight as HemisphereLight);
+    break;
+  }
+};
+
+const addHemisphereLightGui = (
+  gui: GUI,
+  renderer: SceneRenderer,
+  hemisphereLight: HemisphereLight
+) => {
+  hemisphereLight.userData.color = new Color(
+    hemisphereLight.color.r * 255,
+    hemisphereLight.color.g * 255,
+    hemisphereLight.color.b * 255
+  );
+  hemisphereLight.userData.groundColor = new Color(
+    hemisphereLight.groundColor.r * 255,
+    hemisphereLight.groundColor.g * 255,
+    hemisphereLight.groundColor.b * 255
+  );
+  const hemisphereLightGui = gui.addFolder('Hemisphere Light');
+  hemisphereLightGui
+    .addColor(hemisphereLight.userData, 'color')
+    .onChange(() => {
+      hemisphereLight.color.set(
+        new Color(
+          hemisphereLight.userData.color.r / 255,
+          hemisphereLight.userData.color.g / 255,
+          hemisphereLight.userData.color.b / 255
+        )
+      );
+      renderer.sceneHasChanged = true;
+    });
+  hemisphereLightGui
+    .addColor(hemisphereLight.userData, 'groundColor')
+    .onChange(() => {
+      hemisphereLight.groundColor.set(
+        new Color(
+          hemisphereLight.userData.groundColor.r / 255,
+          hemisphereLight.userData.groundColor.g / 255,
+          hemisphereLight.userData.groundColor.b / 255
+        )
+      );
+      renderer.sceneHasChanged = true;
+    });
+  hemisphereLightGui.add(hemisphereLight, 'intensity', 0, 2).onChange(() => {
+    renderer.sceneHasChanged = true;
+  });
 };
 
 renderScene(container, urlParameters);

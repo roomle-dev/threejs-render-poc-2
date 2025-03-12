@@ -3,7 +3,7 @@ import { DirectionalLight, HemisphereLight, Light } from 'three/webgpu';
 
 export class DefaultLightServer implements LightServer {
   public create(): Promise<Light[]> {
-    const environmentLight = new HemisphereLight(0xffffff, 0x080808, 0.5);
+    const environmentLight = new HemisphereLight(0x000000, 0xffffff, 0.5);
     //const lightSource = new PointLight(0xffffff, 100);
     const lightSource = new DirectionalLight(0xffffff, 1);
     lightSource.position.set(100, 150, 100);

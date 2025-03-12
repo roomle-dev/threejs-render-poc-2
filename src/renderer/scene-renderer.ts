@@ -9,6 +9,7 @@ export interface SceneRenderer {
   get domElement(): HTMLElement;
   get renderStatusMessage(): string;
   get scene(): Scene;
+  set sceneHasChanged(value: boolean);
   dispose(): void;
   setSize(width: number, height: number): void;
   createNewScene(sceneServer: SceneServer): Promise<Object3D[]>;
