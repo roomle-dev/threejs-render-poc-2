@@ -25,6 +25,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { TslEffectsTest } from './renderer/tsl-effects-test';
 import { GUI } from 'dat.gui';
 import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
+import { PathTraceDefaultLightServer } from './scene/path-trace-default-light';
 
 interface UrlParameters {
   type: string;
@@ -128,7 +129,11 @@ const newRenderer = async (
       break;
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
-  await renderer.addLights(new DefaultLightServer());
+  await renderer.addLights(
+    rendererType == 'webgl'
+      ? new PathTraceDefaultLightServer()
+      : new DefaultLightServer()
+  );
   await renderer.addHelper(new AxisGridHelperServer());
   return renderer;
 };
