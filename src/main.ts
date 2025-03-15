@@ -34,6 +34,10 @@ function getRandomItem<T>(array: T[]): T {
   return array[randomIndex];
 }
 
+const settings = {
+  glb: '',
+};
+
 interface UrlParameters {
   type: string;
 }
@@ -61,12 +65,6 @@ const renderScene = async (
   } else if (urlParameters.type === 'webgl') {
     renderer.addEffects(new WebGLPathTracerEffect());
   }
-  const stats = newStats();
-  const gui = new GUI();
-  addGui(gui, renderer);
-  addResizeEventListener(cameraControl, renderer);
-  const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
-  animate();
 
   const gbLoader = newGlbLoader();
   const exrLoader = new EXRLoader();
@@ -99,6 +97,12 @@ const renderScene = async (
     }
   );
 
+  const stats = newStats();
+  const gui = new GUI();
+  addGui(gui, renderer, loadNewGlbScene);
+  addResizeEventListener(cameraControl, renderer);
+  const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
+  animate();
   loadNewGlbScene(getRandomItem(glbUrls));
 };
 
@@ -258,7 +262,12 @@ const newStats = (): Stats => {
   return stats;
 };
 
-const addGui = (gui: GUI, renderer: SceneRenderer) => {
+const addGui = (
+  gui: GUI,
+  renderer: SceneRenderer,
+  loadGlb: (resource: string) => void
+) => {
+  addGlbGui(gui, loadGlb);
   renderer.addUI(gui);
   for (const hemisphereLight of renderer.scene.children.filter(
     (child) => child instanceof HemisphereLight
@@ -266,6 +275,31 @@ const addGui = (gui: GUI, renderer: SceneRenderer) => {
     addHemisphereLightGui(gui, renderer, hemisphereLight as HemisphereLight);
     break;
   }
+};
+
+const addGlbGui = (gui: GUI, loadGlb: (resource: string) => void) => {
+  gui.add(settings, 'glb', getSceneMapForUI()).onChange((value) => {
+    if (value !== '') {
+      loadGlb(value);
+    }
+  });
+};
+
+const getSceneMapForUI = () => {
+  const configuratorMenuItems = Object.assign(
+    {},
+    ...glbUrls.map((url: string) => ({
+      [getNameFromGlbResourceName(url)]: url,
+    }))
+  );
+  return configuratorMenuItems;
+};
+
+const getNameFromGlbResourceName = (id: string): string => {
+  const lastIndex = id.lastIndexOf('.glb');
+  const name = id.substring(0, lastIndex);
+  const parts = name.split('/');
+  return `GLB ${parts[parts.length - 1]}`;
 };
 
 const addHemisphereLightGui = (
