@@ -24,6 +24,16 @@ import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 import { PathTraceDefaultLightFactory } from './scene/path-trace-default-light-factory';
 import { SceneObject } from './scene/scene-factory';
 
+const glbUrls = [
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/BrainStem/glTF-Binary/BrainStem.glb',
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+];
+
+function getRandomItem<T>(array: T[]): T {
+  const randomIndex = Math.floor(Math.random() * array.length);
+  return array[randomIndex];
+}
+
 interface UrlParameters {
   type: string;
 }
@@ -89,9 +99,7 @@ const renderScene = async (
     }
   );
 
-  loadNewGlbScene(
-    'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb'
-  );
+  loadNewGlbScene(getRandomItem(glbUrls));
 };
 
 const setStatus = (
