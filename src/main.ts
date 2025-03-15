@@ -61,6 +61,8 @@ const renderScene = async (
   const gbLoader = newGlbLoader();
   const exrLoader = new EXRLoader();
   const rgbeLoader = new RGBELoader();
+  const loadNewGlbScene = (resource: string) =>
+    loadGlb(renderer, resource, gbLoader, sceneObject);
   const loadResource = (
     resourceName: string,
     resource: string | ArrayBuffer | null | undefined
@@ -75,15 +77,20 @@ const renderScene = async (
     } else if (lowerName.endsWith('.hdr')) {
       loadHdr(renderer, resource, rgbeLoader);
     } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
-      void loadGlb(renderer, resource, gbLoader, sceneObject);
+      loadNewGlbScene(resource);
     }
   };
+
   setupDragDrop(
     'holder',
     'hover',
     (file: File, event: ProgressEvent<FileReader>) => {
       loadResource(file.name, event.target?.result);
     }
+  );
+
+  loadNewGlbScene(
+    'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb'
   );
 };
 
