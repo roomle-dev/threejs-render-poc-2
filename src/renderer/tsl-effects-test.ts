@@ -66,6 +66,7 @@ export class TslEffectsTest implements RenderEffects {
   }
 
   public initialize(renderer: Renderer, scene: Scene, camera: Camera) {
+    this._uiProperties.focus = camera.position.length();
     this._postProcessing = new PostProcessing(renderer as Renderer);
     this._effectController = {
       focus: uniform(this._uiProperties.focus),
@@ -130,9 +131,11 @@ export class TslEffectsTest implements RenderEffects {
   public updateCamera(
     _renderer: Renderer,
     _scene: Scene,
-    _camera: Camera
+    camera: Camera
   ): void {
-    // nothing to do
+    (
+      this._effectController?.focus as ShaderNodeObject<UniformNode<number>>
+    ).value = camera.position.length();
   }
 
   public async renderAsync() {
