@@ -1,4 +1,4 @@
-import { SceneServer } from './scene-server';
+import { SceneFactory } from './scene-factory';
 import {
   BoxGeometry,
   Mesh,
@@ -6,7 +6,7 @@ import {
   Object3D,
 } from 'three/webgpu';
 
-export class CubeSceneServer implements SceneServer {
+export class CubeSceneFactory implements SceneFactory {
   async create(): Promise<Object3D[]> {
     const geometry = new BoxGeometry();
     const materials = [

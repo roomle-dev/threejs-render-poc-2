@@ -1,5 +1,5 @@
 import { newRadialFloorTexture } from '../texture/texture-factory';
-import { SceneServer } from './scene-server';
+import { SceneFactory } from './scene-factory';
 import {
   Box3,
   Group,
@@ -15,21 +15,21 @@ export interface ShadowPlaneParameters {
   usePhysicalMaterial?: boolean;
 }
 
-export class ShadowPlaneSceneServer implements SceneServer {
-  private readonly _baseSceneServer: SceneServer;
+export class ShadowPlaneSceneFactory implements SceneFactory {
+  private readonly _baseSceneFactory: SceneFactory;
   private readonly _shadowPlaneParameters: ShadowPlaneParameters;
 
   constructor(
-    baseSceneServer: SceneServer,
+    baseSceneFactory: SceneFactory,
     shadowPlaneParameters: ShadowPlaneParameters
   ) {
-    this._baseSceneServer = baseSceneServer;
+    this._baseSceneFactory = baseSceneFactory;
     this._shadowPlaneParameters = shadowPlaneParameters;
   }
 
   async create(): Promise<Object3D[]> {
     const sceneObjects = new Promise<Object3D[]>((resolve) => {
-      this._baseSceneServer.create().then((baseObjects) => {
+      this._baseSceneFactory.create().then((baseObjects) => {
         const objects: Object3D[] = [];
         const objectGroup = this._newGroup(baseObjects);
         this._liftOnGround(objectGroup);

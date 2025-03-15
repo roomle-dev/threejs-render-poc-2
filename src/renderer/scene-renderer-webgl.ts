@@ -1,5 +1,5 @@
-import { LightServer } from '@/scene/light-server';
-import { SceneServer } from '@/scene/scene-server';
+import { LightFactory } from '@/scene/light-factory';
+import { SceneFactory } from '@/scene/scene-factory';
 import { SceneRenderer } from './scene-renderer';
 import {
   Camera,
@@ -9,7 +9,7 @@ import {
   Texture,
 } from 'three/webgpu';
 import { WebGLRenderer } from 'three';
-import { SceneHelperServer } from '@/scene/scene-helper-server';
+import { SceneHelperFactory } from '@/scene/scene-helper-factory';
 import { RenderEffects } from './render-effects';
 import { GUI } from 'dat.gui';
 
@@ -77,8 +77,8 @@ export class SceneRendererWebGL implements SceneRenderer {
     this._effectsNeedUpdate = true;
   }
 
-  public async createNewScene(sceneServer: SceneServer): Promise<Object3D[]> {
-    const sceneObjects = await sceneServer.create();
+  public async createNewScene(SceneFactory: SceneFactory): Promise<Object3D[]> {
+    const sceneObjects = await SceneFactory.create();
     for (const sceneObject of this._sceneObjects) {
       this._scene.remove(sceneObject);
     }
@@ -96,14 +96,16 @@ export class SceneRendererWebGL implements SceneRenderer {
     this._effectsNeedUpdate = true;
   }
 
-  public async addLights(lightServer: LightServer): Promise<void> {
-    const lights = await lightServer.create();
+  public async addLights(LightFactory: LightFactory): Promise<void> {
+    const lights = await LightFactory.create();
     lights.forEach((light) => this._scene.add(light));
     this._effectsNeedUpdate = true;
   }
 
-  public async addHelper(sceneHelperServer: SceneHelperServer): Promise<void> {
-    const sceneHelpers = await sceneHelperServer.create();
+  public async addHelper(
+    SceneHelperFactory: SceneHelperFactory
+  ): Promise<void> {
+    const sceneHelpers = await SceneHelperFactory.create();
     sceneHelpers.forEach((sceneHelper) => this._scene.add(sceneHelper));
   }
 

@@ -1,8 +1,8 @@
-import { SceneServer } from './scene-server';
+import { SceneFactory } from './scene-factory';
 import { Mesh, MeshStandardMaterial, Object3D } from 'three/webgpu';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-export class GlbSceneServer implements SceneServer {
+export class GlbSceneFactory implements SceneFactory {
   private _resource: string;
   private _gbLoader: GLTFLoader;
 

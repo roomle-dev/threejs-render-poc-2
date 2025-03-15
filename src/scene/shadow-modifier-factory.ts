@@ -1,15 +1,15 @@
 import { Mesh } from 'three/webgpu';
-import { SceneServer } from './scene-server';
+import { SceneFactory } from './scene-factory';
 
-export class ShadowModifierServer {
-  private readonly _baseSceneServer: SceneServer;
+export class ShadowModifierFactory {
+  private readonly _baseSceneFactory: SceneFactory;
 
-  constructor(baseSceneServer: SceneServer) {
-    this._baseSceneServer = baseSceneServer;
+  constructor(baseSceneFactory: SceneFactory) {
+    this._baseSceneFactory = baseSceneFactory;
   }
 
   public create() {
-    const sceneObjects = this._baseSceneServer.create();
+    const sceneObjects = this._baseSceneFactory.create();
     sceneObjects.then((objects) => {
       objects.forEach((object) => {
         object.traverse((node) => {

@@ -1,7 +1,7 @@
-import { LightServer } from './light-server';
+import { LightFactory } from './light-factory';
 import { Light, RectAreaLight } from 'three/webgpu';
 
-export class PathTraceDefaultLightServer implements LightServer {
+export class PathTraceDefaultLightFactory implements LightFactory {
   public create(): Promise<Light[]> {
     const lightSourceTop = new RectAreaLight(0xffffff, 100, 100, 100);
     lightSourceTop.position.set(0, 500, 0);

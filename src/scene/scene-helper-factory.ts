@@ -1,5 +1,5 @@
 import { Object3D } from 'three/webgpu';
 
-export interface SceneHelperServer {
+export interface SceneHelperFactory {
   create(): Promise<Object3D[]>;
 }
