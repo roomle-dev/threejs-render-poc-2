@@ -1,12 +1,11 @@
 import { LightFactory } from '@/scene/light-factory';
-import { SceneFactory } from '@/scene/scene-factory';
+import { SceneFactory, SceneObject } from '@/scene/scene-factory';
 import { SceneRenderer } from './scene-renderer';
 import { SceneHelperFactory } from '@/scene/scene-helper-factory';
 import { RenderEffects } from './render-effects';
 import {
   Camera,
   NeutralToneMapping,
-  Object3D,
   Scene,
   Texture,
   WebGPURenderer,
@@ -29,7 +28,7 @@ interface UiProperties {
 export class SceneRendererWebGPU implements SceneRenderer {
   private _renderer: WebGPURenderer;
   private _scene: Scene;
-  private _sceneObjects: Object3D[] = [];
+  private _sceneObject: SceneObject | null = null;
   private _renderEffects?: RenderEffects;
   private _effectsNeedUpdate: boolean = false;
   private _cameraHasChanged: boolean = false;
@@ -96,17 +95,19 @@ export class SceneRendererWebGPU implements SceneRenderer {
     this._effectsNeedUpdate = true;
   }
 
-  public async createNewScene(SceneFactory: SceneFactory): Promise<Object3D[]> {
-    const sceneObjects = await SceneFactory.create();
-    for (const sceneObject of this._sceneObjects) {
-      this._scene.remove(sceneObject);
+  public async createNewScene(
+    SceneFactory: SceneFactory
+  ): Promise<SceneObject> {
+    const sceneObject = await SceneFactory.create();
+    for (const oldObject of this._sceneObject?.objects ?? []) {
+      this._scene.remove(oldObject);
     }
-    this._sceneObjects = sceneObjects;
-    for (const sceneObject of sceneObjects) {
-      this._scene.add(sceneObject);
+    this._sceneObject = sceneObject;
+    for (const newObject of sceneObject.objects) {
+      this._scene.add(newObject);
     }
     this._effectsNeedUpdate = true;
-    return this._sceneObjects;
+    return sceneObject;
   }
 
   public setEnvironmentMap(equirectTexture: Texture): void {

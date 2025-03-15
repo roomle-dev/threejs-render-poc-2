@@ -9,9 +9,9 @@ export class ShadowModifierFactory {
   }
 
   public create() {
-    const sceneObjects = this._baseSceneFactory.create();
-    sceneObjects.then((objects) => {
-      objects.forEach((object) => {
+    const newSceneObject = this._baseSceneFactory.create();
+    newSceneObject.then((sceneObject) => {
+      sceneObject.objects.forEach((object) => {
         object.traverse((node) => {
           if (node instanceof Mesh) {
             node.receiveShadow = true;
@@ -20,6 +20,6 @@ export class ShadowModifierFactory {
         });
       });
     });
-    return sceneObjects;
+    return newSceneObject;
   }
 }

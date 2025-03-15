@@ -1,5 +1,5 @@
-import { SceneFactory } from './scene-factory';
-import { Mesh, MeshStandardMaterial, Object3D } from 'three/webgpu';
+import { SceneFactory, SceneObject } from './scene-factory';
+import { Mesh, MeshStandardMaterial } from 'three/webgpu';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class GlbSceneFactory implements SceneFactory {
@@ -11,7 +11,7 @@ export class GlbSceneFactory implements SceneFactory {
     this._gbLoader = gbLoader;
   }
 
-  async create(): Promise<Object3D[]> {
+  async create(): Promise<SceneObject> {
     const glb = await this._gbLoader.loadAsync(this._resource);
     glb.scene.traverse((child) => {
       if (child instanceof Mesh) {
@@ -21,10 +21,6 @@ export class GlbSceneFactory implements SceneFactory {
         }
       }
     });
-    return Promise.resolve([glb.scene]);
-  }
-
-  public animate(_deltaTimeInMs: number): void {
-    // nothing to do
+    return Promise.resolve({ objects: [glb.scene], animations: [] });
   }
 }

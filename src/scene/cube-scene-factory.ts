@@ -1,13 +1,8 @@
-import { SceneFactory } from './scene-factory';
-import {
-  BoxGeometry,
-  Mesh,
-  MeshPhysicalMaterial,
-  Object3D,
-} from 'three/webgpu';
+import { SceneFactory, SceneObject } from './scene-factory';
+import { BoxGeometry, Mesh, MeshPhysicalMaterial } from 'three/webgpu';
 
 export class CubeSceneFactory implements SceneFactory {
-  async create(): Promise<Object3D[]> {
+  async create(): Promise<SceneObject> {
     const geometry = new BoxGeometry();
     const materials = [
       new MeshPhysicalMaterial({ color: 0xff0000 }), // Red
@@ -19,10 +14,6 @@ export class CubeSceneFactory implements SceneFactory {
     ];
     const cube = new Mesh(geometry, materials);
     cube.position.y = 1.5;
-    return Promise.resolve([cube]);
-  }
-
-  public animate(_deltaTimeInMs: number): void {
-    // nothing to do
+    return Promise.resolve({ objects: [cube], animations: [] });
   }
 }

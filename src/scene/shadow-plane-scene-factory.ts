@@ -1,5 +1,5 @@
 import { newRadialFloorTexture } from '../texture/texture-factory';
-import { SceneFactory } from './scene-factory';
+import { SceneFactory, SceneObject } from './scene-factory';
 import {
   Box3,
   Group,
@@ -27,18 +27,18 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
     this._shadowPlaneParameters = shadowPlaneParameters;
   }
 
-  async create(): Promise<Object3D[]> {
-    const sceneObjects = new Promise<Object3D[]>((resolve) => {
-      this._baseSceneFactory.create().then((baseObjects) => {
-        const objects: Object3D[] = [];
-        const objectGroup = this._newGroup(baseObjects);
+  async create(): Promise<SceneObject> {
+    const resultSceneObject = new Promise<SceneObject>((resolve) => {
+      this._baseSceneFactory.create().then((baseObject) => {
+        const objectGroup = this._newGroup(baseObject.objects);
         this._liftOnGround(objectGroup);
-        objects.push(objectGroup);
-        objects.push(this._newShadowPlane());
-        resolve(objects);
+        resolve({
+          objects: [objectGroup, this._newShadowPlane()],
+          animations: baseObject.animations,
+        });
       });
     });
-    return sceneObjects;
+    return resultSceneObject;
   }
 
   private _newGroup(objects: Object3D[]): Object3D {

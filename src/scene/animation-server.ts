@@ -1,3 +1,5 @@
+import { Object3D } from 'three/webgpu';
+
 export interface AnimationServer {
-  animate(deltaTimeInMs: number): void;
+  animate(object: Object3D, deltaTimeInMs: number): void;
 }

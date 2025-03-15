@@ -6,11 +6,7 @@ import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { setupDragDrop } from './util/drag-target';
-import {
-  glbSceneFactory,
-  rotatingCubeFactory,
-  SceneFactoryObjects,
-} from './scene/scene-factories';
+import { glbSceneFactory, rotatingCubeFactory } from './scene/scene-factories';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
   Color,
@@ -26,6 +22,7 @@ import { TslEffectsTest } from './renderer/tsl-effects-test';
 import { GUI } from 'dat.gui';
 import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 import { PathTraceDefaultLightFactory } from './scene/path-trace-default-light-factory';
+import { SceneObject } from './scene/scene-factory';
 
 interface UrlParameters {
   type: string;
@@ -44,8 +41,8 @@ const renderScene = async (
 ) => {
   const renderer = await newRenderer(urlParameters.type, container);
   const cameraControl = newCameraControl(container, renderer);
-  const SceneFactoryObjects = rotatingCubeFactory(urlParameters.type);
-  await renderer.createNewScene(SceneFactoryObjects.SceneFactory);
+  const sceneFactory = rotatingCubeFactory(urlParameters.type);
+  const sceneObject = await renderer.createNewScene(sceneFactory);
   if (
     urlParameters.type === 'webgpu' ||
     urlParameters.type === 'webgpu-forcewebgl'
@@ -58,12 +55,7 @@ const renderScene = async (
   const gui = new GUI();
   addGui(gui, renderer);
   addResizeEventListener(cameraControl, renderer);
-  const animate = newAnimationLoop(
-    renderer,
-    cameraControl,
-    SceneFactoryObjects,
-    stats
-  );
+  const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
 
   const gbLoader = newGlbLoader();
@@ -83,7 +75,7 @@ const renderScene = async (
     } else if (lowerName.endsWith('.hdr')) {
       loadHdr(renderer, resource, rgbeLoader);
     } else if (lowerName.endsWith('.glb') || lowerName.endsWith('.gltf')) {
-      void loadGlb(renderer, resource, gbLoader, SceneFactoryObjects);
+      void loadGlb(renderer, resource, gbLoader, sceneObject);
     }
   };
   setupDragDrop(
@@ -153,7 +145,7 @@ const newCameraControl = (
 const newAnimationLoop = (
   renderer: SceneRenderer,
   cameraControl: CameraOrbitControls,
-  SceneFactoryObjects: SceneFactoryObjects,
+  sceneObject: SceneObject,
   stats: Stats
 ) => {
   let previousTimeStamp: number | undefined;
@@ -161,7 +153,7 @@ const newAnimationLoop = (
     const deltaTimeMs = timestamp - (previousTimeStamp ?? timestamp);
     previousTimeStamp = timestamp;
     requestAnimationFrame(animate);
-    for (const animationServer of SceneFactoryObjects.animationServer) {
+    for (const animationServer of sceneObject.animations) {
       animationServer.animate(deltaTimeMs);
     }
     renderer.render(cameraControl.camera);
@@ -230,19 +222,18 @@ const loadGlb = async (
   renderer: SceneRenderer,
   resource: string,
   gbLoader: GLTFLoader,
-  SceneFactoryObjects: SceneFactoryObjects
+  scneeObject: SceneObject
 ) => {
-  const newSceneFactoryObjects = glbSceneFactory(
+  const newSceneFactory = glbSceneFactory(
     urlParameters.type,
     resource,
     gbLoader
   );
-  renderer.createNewScene(newSceneFactoryObjects.SceneFactory).then(() => {
-    SceneFactoryObjects.SceneFactory = newSceneFactoryObjects.SceneFactory;
-    SceneFactoryObjects.animationServer.length = 0;
-    SceneFactoryObjects.animationServer.push(
-      ...newSceneFactoryObjects.animationServer
-    );
+  renderer.createNewScene(newSceneFactory).then((newSceneObject) => {
+    scneeObject.objects.length = 0;
+    scneeObject.animations.length = 0;
+    scneeObject.objects.push(...newSceneObject.objects);
+    scneeObject.animations.push(...newSceneObject.animations);
   });
 };
 
