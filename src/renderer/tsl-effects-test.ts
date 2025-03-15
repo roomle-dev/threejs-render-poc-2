@@ -119,6 +119,14 @@ export class TslEffectsTest implements RenderEffects {
     }
   }
 
+  public updateEnvironment(
+    _renderer: Renderer,
+    _scene: Scene,
+    _camera: Camera
+  ): void {
+    // nothing to do
+  }
+
   public updateCamera(
     _renderer: Renderer,
     _scene: Scene,

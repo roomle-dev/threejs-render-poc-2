@@ -17,6 +17,7 @@ export class SceneRendererWebGL implements SceneRenderer {
   private _sceneObject: SceneObject | null = null;
   private _renderEffects?: RenderEffects;
   private _effectsNeedUpdate: boolean = false;
+  private _environmentHasChanged: boolean = false;
   private _cameraHasChanged: boolean = false;
   private _uiProperties: UiProperties = { 'enable path tracer': true };
 
@@ -89,7 +90,7 @@ export class SceneRendererWebGL implements SceneRenderer {
   public setEnvironmentMap(equirectTexture: Texture): void {
     this._scene.background = equirectTexture;
     this._scene.environment = equirectTexture;
-    this._effectsNeedUpdate = true;
+    this._environmentHasChanged = true;
   }
 
   public async addLights(LightFactory: LightFactory): Promise<void> {
@@ -122,6 +123,14 @@ export class SceneRendererWebGL implements SceneRenderer {
         if (this._scene.environment) {
           this._scene.environment.needsUpdate = true;
         }
+      }
+      if (this._environmentHasChanged) {
+        this._environmentHasChanged = false;
+        this._renderEffects.updateEnvironment(
+          this._renderer,
+          this._scene,
+          camera
+        );
       }
       if (this._cameraHasChanged) {
         this._cameraHasChanged = false;

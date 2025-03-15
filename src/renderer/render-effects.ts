@@ -16,6 +16,11 @@ export interface RenderEffects {
     scene: Scene,
     camera: Camera
   ): void;
+  updateEnvironment(
+    renderer: Renderer | WebGLRenderer,
+    scene: Scene,
+    camera: Camera
+  ): void;
   updateCamera(
     renderer: Renderer | WebGLRenderer,
     scene: Scene,

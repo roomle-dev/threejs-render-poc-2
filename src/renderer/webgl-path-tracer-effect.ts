@@ -68,6 +68,14 @@ export class WebGLPathTracerEffect implements RenderEffects {
     }
   }
 
+  public updateEnvironment(
+    _renderer: WebGLRenderer,
+    _scene: Scene,
+    _camera: Camera
+  ): void {
+    this._pathTracer?.updateEnvironment();
+  }
+
   public updateCamera(
     _renderer: WebGLRenderer,
     _scene: Scene,
