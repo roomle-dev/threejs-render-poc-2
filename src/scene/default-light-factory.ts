@@ -15,12 +15,4 @@ export class DefaultLightFactory implements LightFactory {
     lightSource.shadow.camera.lookAt(0, 0, 0);
     return Promise.resolve([environmentLight, lightSource]);
   }
-
-  public reset(): void {
-    // nihting to do
-  }
-
-  public progress(): void {
-    // nothiong to do
-  }
 }

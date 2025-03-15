@@ -22,12 +22,4 @@ export class PathTraceDefaultLightFactory implements LightFactory {
       lightSource4,
     ]);
   }
-
-  public reset(): void {
-    // nihting to do
-  }
-
-  public progress(): void {
-    // nothiong to do
-  }
 }
