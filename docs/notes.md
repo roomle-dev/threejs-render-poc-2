@@ -13,3 +13,7 @@ Can the AO be applied to the material by setting the `aoMap` and using screen sp
 ## Material
 
 `ShadowMaterial` does not seem to work with the `WebGPURenderer`.
+
+## Light
+
+Create a progressive shadow from a `RectAreaLight` using TSL and create a three.js example.
