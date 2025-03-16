@@ -24,10 +24,62 @@ import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 import { PathTraceDefaultLightFactory } from './scene/path-trace-default-light-factory';
 import { SceneObject } from './scene/scene-factory';
 
-const glbUrls = [
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/BrainStem/glTF-Binary/BrainStem.glb',
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+const khronosAssetsUrl =
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/';
+
+const khronosGlbAssets = [
+  'AnisotropyBarnLamp',
+  'AntiqueCamera',
+  'Avocado',
+  'BarramundiFish',
+  'BoomBox',
+  'BrainStem',
+  'ChairDamaskPurplegold',
+  'CommercialRefrigerator',
+  'Corset',
+  'DamagedHelmet',
+  'DragonAttenuation',
+  'DragonDispersion',
+  'Duck',
+  'GlamVelvetSofa',
+  'GlassBrokenWindow',
+  'GlassHurricaneCandleHolder',
+  'GlassVaseFlowers',
+  'IridescenceAbalone',
+  'IridescenceLamp',
+  'IridescenceSuzanne',
+  'IridescentDishWithOlives',
+  'Lantern',
+  'LightsPunctualLamp',
+  'MaterialsVariantsShoe',
+  'MosquitoInAmber',
+  'PotOfCoalsAnimationPointer',
+  'SheenChair',
+  'SheenWoodLeatherSofa',
+  'SunglassesKhronos',
+  'ToyCar',
+  'WaterBottle',
 ];
+
+const glbUrls = [
+  ...khronosGlbAssets.map(
+    (asset) => `${khronosAssetsUrl}${asset}/glTF-Binary/${asset}.glb`
+  ),
+];
+
+const getNameFromResourceName = (id: string): string => {
+  let lastIndex = id.lastIndexOf('.glb');
+  if (lastIndex === -1) {
+    lastIndex = id.lastIndexOf('.gltf');
+  }
+  const name = id.substring(0, lastIndex);
+  const parts = name.split('/');
+  return `GLB ${parts[parts.length - 1]}`;
+};
+
+glbUrls.sort((a: string, b: string) => {
+  return getNameFromResourceName(a).localeCompare(getNameFromResourceName(b));
+});
 
 function getRandomItem<T>(array: T[]): T {
   const randomIndex = Math.floor(Math.random() * array.length);
@@ -289,17 +341,10 @@ const getSceneMapForUI = () => {
   const configuratorMenuItems = Object.assign(
     {},
     ...glbUrls.map((url: string) => ({
-      [getNameFromGlbResourceName(url)]: url,
+      [getNameFromResourceName(url)]: url,
     }))
   );
   return configuratorMenuItems;
-};
-
-const getNameFromGlbResourceName = (id: string): string => {
-  const lastIndex = id.lastIndexOf('.glb');
-  const name = id.substring(0, lastIndex);
-  const parts = name.split('/');
-  return `GLB ${parts[parts.length - 1]}`;
 };
 
 const addHemisphereLightGui = (
