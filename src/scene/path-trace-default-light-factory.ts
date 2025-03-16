@@ -1,8 +1,9 @@
 import { LightFactory } from './light-factory';
-import { Light, RectAreaLight } from 'three/webgpu';
+import { HemisphereLight, Light, RectAreaLight } from 'three/webgpu';
 
 export class PathTraceDefaultLightFactory implements LightFactory {
   public create(): Promise<Light[]> {
+    const environmentLight = new HemisphereLight(0x404040, 0xffffff, 2);
     const lightSourceTop = new RectAreaLight(0xffffff, 100, 100, 100);
     lightSourceTop.position.set(0, 500, 0);
     lightSourceTop.lookAt(0, 0, 0);
@@ -16,6 +17,7 @@ export class PathTraceDefaultLightFactory implements LightFactory {
     lightSource4.position.set(0, 400, -500);
     lightSource4.lookAt(0, 0, 0);
     return Promise.resolve([
+      environmentLight,
       lightSourceTop,
       lightSource2,
       lightSource3,

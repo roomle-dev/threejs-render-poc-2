@@ -1,4 +1,4 @@
-import { Camera, Scene } from 'three/webgpu';
+import { Camera, HemisphereLight, Scene } from 'three/webgpu';
 import { RenderEffects } from './render-effects';
 import { WebGLPathTracer } from 'three-gpu-pathtracer';
 import { GUI } from 'dat.gui';
@@ -82,6 +82,19 @@ export class WebGLPathTracerEffect implements RenderEffects {
     _camera: Camera
   ): void {
     this._pathTracer?.updateCamera();
+  }
+
+  public updateLights(
+    _renderer: WebGLRenderer,
+    scene: Scene,
+    _camera: Camera,
+    enabled: boolean
+  ): void {
+    scene.traverse((node) => {
+      if (node instanceof HemisphereLight) {
+        node.visible = !(enabled && this._uiProperties.enable);
+      }
+    });
   }
 
   public async renderAsync(): Promise<void> {

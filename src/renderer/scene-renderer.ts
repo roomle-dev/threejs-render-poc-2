@@ -115,6 +115,14 @@ export abstract class SceneRenderer {
   }
 
   public async render(camera: Camera): Promise<void> {
+    if (this._effectsNeedUpdate) {
+      this._renderEffects?.updateLights(
+        this._renderer,
+        this._scene,
+        camera,
+        this.effectsEnabled
+      );
+    }
     if (this.effectsEnabled && this._renderEffects) {
       if (this._effectsNeedUpdate) {
         this._effectsNeedUpdate = false;

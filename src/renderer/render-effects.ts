@@ -26,6 +26,12 @@ export interface RenderEffects {
     scene: Scene,
     camera: Camera
   ): void;
+  updateLights(
+    renderer: Renderer | WebGLRenderer,
+    scene: Scene,
+    camera: Camera,
+    enabled: boolean
+  ): void;
   renderAsync(): Promise<void>;
   addUI(gui: GUI): void;
 }

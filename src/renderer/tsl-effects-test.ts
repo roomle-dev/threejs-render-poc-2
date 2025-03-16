@@ -138,6 +138,15 @@ export class TslEffectsTest implements RenderEffects {
     ).value = camera.position.length();
   }
 
+  public updateLights(
+    _renderer: Renderer,
+    _scene: Scene,
+    _camera: Camera,
+    _enabled: boolean
+  ): void {
+    // nothing to do
+  }
+
   public async renderAsync() {
     return this._postProcessing?.renderAsync();
   }

@@ -400,7 +400,7 @@ const addHemisphereLightGui = (
       );
       renderer.sceneHasChanged = true;
     });
-  hemisphereLightGui.add(hemisphereLight, 'intensity', 0, 2).onChange(() => {
+  hemisphereLightGui.add(hemisphereLight, 'intensity', 0, 10).onChange(() => {
     renderer.sceneHasChanged = true;
   });
 };
