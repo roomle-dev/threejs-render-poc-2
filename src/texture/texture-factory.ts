@@ -6,7 +6,10 @@ import {
   UnsignedByteType,
 } from 'three/webgpu';
 
-export const newRadialFloorTexture = (dim: number): DataTexture => {
+export const newRadialFloorTexture = (
+  dim: number,
+  opaqueRadius: number = 0
+): DataTexture => {
   const data = new Uint8Array(dim * dim * 4);
 
   for (let x = 0; x < dim; x++) {
@@ -15,13 +18,15 @@ export const newRadialFloorTexture = (dim: number): DataTexture => {
       const yNorm = y / (dim - 1);
       const xCent = 2.0 * (xNorm - 0.5);
       const yCent = 2.0 * (yNorm - 0.5);
-      let a = Math.max(
-        Math.min(1.0 - Math.sqrt(xCent ** 2 + yCent ** 2), 1.0),
-        0.0
-      );
-      a = a ** 1.5;
-      a = a * 1.5;
-      a = Math.min(a, 1.0);
+      let d = Math.sqrt(xCent ** 2 + yCent ** 2);
+      let a = 1;
+      if (d > opaqueRadius) {
+        d = (d - opaqueRadius) / (1 - opaqueRadius);
+        a = Math.max(Math.min(1.0 - d, 1.0), 0.0);
+        a = a ** 1.5;
+        a = a * 1.5;
+        a = Math.min(a, 1.0);
+      }
       const i = y * dim + x;
       data[i * 4 + 0] = 255;
       data[i * 4 + 1] = 255;

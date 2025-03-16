@@ -72,9 +72,11 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
           color: 0xffffff,
           metalness: 0.0,
           roughness: 0.2,
-          reflectivity: 0.8,
+          reflectivity: 1.0,
+          clearcoat: 0.7,
+          sheen: 1.0,
           transparent: true,
-          map: newRadialFloorTexture(1024),
+          map: newRadialFloorTexture(1024, 0.5),
         })
       : new ShadowMaterial();
     groundMaterial.polygonOffset = true;
