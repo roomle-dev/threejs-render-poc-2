@@ -61,7 +61,7 @@ const khronosGlbAssets = [
   'WaterBottle',
 ];
 
-const abbid76AssetsUrl =
+const rabbid76AssetsUrl =
   'https://raw.githubusercontent.com/Rabbid76/assets-materials-models/main/';
 
 const rabbid76GlbAssets = [
@@ -76,21 +76,42 @@ const glbUrls = [
     (asset) => `${khronosAssetsUrl}${asset}/glTF-Binary/${asset}.glb`
   ),
   ...rabbid76GlbAssets.map(
-    (asset) => `${abbid76AssetsUrl}assets/models/glb/${asset}.glb`
+    (asset) => `${rabbid76AssetsUrl}assets/models/glb/${asset}.glb`
+  ),
+];
+
+const rabbid76environmentMaps = [
+  'belfast_farmhouse_4k.hdr',
+  'qwantani_puresky_4k.hdr',
+  'studio_small_09_4k.hdr',
+  'syferfontein_1d_clear_4k.hdr',
+];
+
+const environmentMaps = [
+  ...rabbid76environmentMaps.map(
+    (asset) => `${rabbid76AssetsUrl}assets/environment-maps/${asset}`
   ),
 ];
 
 const getNameFromResourceName = (id: string): string => {
-  let lastIndex = id.lastIndexOf('.glb');
-  if (lastIndex === -1) {
-    lastIndex = id.lastIndexOf('.gltf');
+  const extensions = ['glb', 'gltf', 'hdr', 'exr'];
+  let lastIndex = -1;
+  for (const extension of extensions) {
+    lastIndex = id.lastIndexOf('.' + extension);
+    if (lastIndex !== -1) {
+      break;
+    }
   }
   const name = id.substring(0, lastIndex);
   const parts = name.split('/');
-  return `GLB ${parts[parts.length - 1]}`;
+  return `${parts[parts.length - 1]}`;
 };
 
 glbUrls.sort((a: string, b: string) => {
+  return getNameFromResourceName(a).localeCompare(getNameFromResourceName(b));
+});
+
+environmentMaps.sort((a: string, b: string) => {
   return getNameFromResourceName(a).localeCompare(getNameFromResourceName(b));
 });
 
@@ -101,6 +122,7 @@ function getRandomItem<T>(array: T[]): T {
 
 const settings = {
   glb: '',
+  envMap: '',
 };
 
 interface UrlParameters {
@@ -153,6 +175,9 @@ const renderScene = async (
       loadNewGlbScene(resource);
     }
   };
+  const loadNewResource = (resource: string) => {
+    loadResource(resource, resource);
+  };
 
   setupDragDrop(
     'holder',
@@ -164,10 +189,11 @@ const renderScene = async (
 
   const stats = newStats();
   const gui = new GUI();
-  addGui(gui, renderer, loadNewGlbScene);
+  addGui(gui, renderer, loadNewResource);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
+  loadNewResource(getRandomItem(environmentMaps));
   loadNewGlbScene(getRandomItem(glbUrls));
 };
 
@@ -330,9 +356,10 @@ const newStats = (): Stats => {
 const addGui = (
   gui: GUI,
   renderer: SceneRenderer,
-  loadGlb: (resource: string) => void
+  loadNewResource: (resource: string) => void
 ) => {
-  addGlbGui(gui, loadGlb);
+  addGlbGui(gui, loadNewResource);
+  addEnvironemntMapGui(gui, loadNewResource);
   renderer.addUI(gui);
   for (const hemisphereLight of renderer.scene.children.filter(
     (child) => child instanceof HemisphereLight
@@ -343,17 +370,38 @@ const addGui = (
 };
 
 const addGlbGui = (gui: GUI, loadGlb: (resource: string) => void) => {
-  gui.add(settings, 'glb', getSceneMapForUI()).onChange((value) => {
+  gui.add(settings, 'glb', getScenesForUI()).onChange((value) => {
     if (value !== '') {
       loadGlb(value);
     }
   });
 };
 
-const getSceneMapForUI = () => {
+const addEnvironemntMapGui = (
+  gui: GUI,
+  loadEnvironmentMap: (resource: string) => void
+) => {
+  gui.add(settings, 'envMap', getEnvironmentForUI()).onChange((value) => {
+    if (value !== '') {
+      loadEnvironmentMap(value);
+    }
+  });
+};
+
+const getScenesForUI = () => {
   const configuratorMenuItems = Object.assign(
     {},
     ...glbUrls.map((url: string) => ({
+      [getNameFromResourceName(url)]: url,
+    }))
+  );
+  return configuratorMenuItems;
+};
+
+const getEnvironmentForUI = () => {
+  const configuratorMenuItems = Object.assign(
+    {},
+    ...environmentMaps.map((url: string) => ({
       [getNameFromResourceName(url)]: url,
     }))
   );
