@@ -77,6 +77,9 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
           map: newRadialFloorTexture(1024),
         })
       : new ShadowMaterial();
+    groundMaterial.polygonOffset = true;
+    groundMaterial.polygonOffsetFactor = 4;
+    groundMaterial.polygonOffsetUnits = 4;
     const groundMesh = new Mesh(groundGeometry, groundMaterial);
     groundMesh.receiveShadow = true;
     return groundMesh;
