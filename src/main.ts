@@ -61,9 +61,22 @@ const khronosGlbAssets = [
   'WaterBottle',
 ];
 
+const abbid76AssetsUrl =
+  'https://raw.githubusercontent.com/Rabbid76/assets-materials-models/main/';
+
+const rabbid76GlbAssets = [
+  'FlightHelmet',
+  'SciFiHelmet',
+  'SheenCloth',
+  'StainedGlassLamp',
+];
+
 const glbUrls = [
   ...khronosGlbAssets.map(
     (asset) => `${khronosAssetsUrl}${asset}/glTF-Binary/${asset}.glb`
+  ),
+  ...rabbid76GlbAssets.map(
+    (asset) => `${abbid76AssetsUrl}assets/models/glb/${asset}.glb`
   ),
 ];
 
