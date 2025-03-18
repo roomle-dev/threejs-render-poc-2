@@ -189,7 +189,7 @@ const renderScene = async (
 
   const stats = newStats();
   const gui = new GUI();
-  addGui(gui, renderer, loadNewResource);
+  addGui(gui, urlParameters, renderer, loadNewResource);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
@@ -355,17 +355,20 @@ const newStats = (): Stats => {
 
 const addGui = (
   gui: GUI,
+  urlParameters: UrlParameters,
   renderer: SceneRenderer,
   loadNewResource: (resource: string) => void
 ) => {
   addGlbGui(gui, loadNewResource);
-  addEnvironemntMapGui(gui, loadNewResource);
+  addEnvironmentMapGui(gui, loadNewResource);
   renderer.addUI(gui);
-  for (const hemisphereLight of renderer.scene.children.filter(
-    (child) => child instanceof HemisphereLight
-  )) {
-    addHemisphereLightGui(gui, renderer, hemisphereLight as HemisphereLight);
-    break;
+  if (urlParameters.type !== 'webgl') {
+    for (const hemisphereLight of renderer.scene.children.filter(
+      (child) => child instanceof HemisphereLight
+    )) {
+      addHemisphereLightGui(gui, renderer, hemisphereLight as HemisphereLight);
+      break;
+    }
   }
 };
 
@@ -377,7 +380,7 @@ const addGlbGui = (gui: GUI, loadGlb: (resource: string) => void) => {
   });
 };
 
-const addEnvironemntMapGui = (
+const addEnvironmentMapGui = (
   gui: GUI,
   loadEnvironmentMap: (resource: string) => void
 ) => {
