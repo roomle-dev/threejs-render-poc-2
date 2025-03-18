@@ -12,11 +12,15 @@ interface BackendType {
 }
 
 interface UiProperties {
-  'enable effects': true;
+  'enable effects': boolean;
+  'environment background': boolean;
 }
 
 export class SceneRendererWebGPU extends SceneRenderer {
-  private _uiProperties: UiProperties = { 'enable effects': true };
+  private _uiProperties: UiProperties = {
+    'enable effects': true,
+    'environment background': true,
+  };
   private _webGpuRenderer: WebGPURenderer;
 
   constructor(
@@ -39,6 +43,10 @@ export class SceneRendererWebGPU extends SceneRenderer {
     );
   }
 
+  public get showEnvironmentInBackground(): boolean {
+    return this._uiProperties['environment background'];
+  }
+
   public get renderStatusMessage(): string {
     const effectsMessage = this.effectsEnabled
       ? this.renderEffects?.renderStatusMessage
@@ -57,6 +65,9 @@ export class SceneRendererWebGPU extends SceneRenderer {
     gui
       .add(this._uiProperties, 'enable effects')
       .onChange(() => (this.effectsNeedUpdate = true));
+    gui
+      .add(this._uiProperties, 'environment background')
+      .onChange(() => (this.environmentHasChanged = true));
     this.renderEffects?.addUI(gui);
   }
 }

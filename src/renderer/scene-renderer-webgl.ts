@@ -27,6 +27,10 @@ export class SceneRendererWebGL extends SceneRenderer {
     );
   }
 
+  public get showEnvironmentInBackground(): boolean {
+    return true;
+  }
+
   public get renderStatusMessage(): string {
     const effectsMessage = this.effectsEnabled
       ? this.renderEffects?.renderStatusMessage

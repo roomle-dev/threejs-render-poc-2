@@ -2,6 +2,7 @@ import { LightFactory } from '@/scene/light-factory';
 import { SceneFactory, SceneObject } from '@/scene/scene-factory';
 import {
   Camera,
+  Color,
   NeutralToneMapping,
   Scene,
   Texture,
@@ -38,7 +39,7 @@ export abstract class SceneRenderer {
   }
 
   public abstract get effectsEnabled(): boolean;
-
+  public abstract get showEnvironmentInBackground(): boolean;
   public abstract get renderStatusMessage(): string;
 
   public get scene(): Scene {
@@ -56,6 +57,12 @@ export abstract class SceneRenderer {
   set sceneHasChanged(value: boolean) {
     if (value) {
       this._effectsNeedUpdate = true;
+    }
+  }
+
+  set environmentHasChanged(value: boolean) {
+    if (value) {
+      this._environmentHasChanged = true;
     }
   }
 
@@ -87,7 +94,6 @@ export abstract class SceneRenderer {
   }
 
   public setEnvironmentMap(equirectTexture: Texture): void {
-    this._scene.background = equirectTexture;
     this._scene.environment = equirectTexture;
     this._environmentHasChanged = true;
   }
@@ -133,6 +139,9 @@ export abstract class SceneRenderer {
       }
       if (this._environmentHasChanged) {
         this._environmentHasChanged = false;
+        this._scene.background = this.showEnvironmentInBackground
+          ? this._scene.environment
+          : new Color(0xffffff);
         this._renderEffects.updateEnvironment(
           this._renderer,
           this._scene,
