@@ -9,7 +9,7 @@
     "serve": "vite preview",
     "format": "prettier --write 'src/**/*.{ts,tsx,html,css}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
-    "ncu": "ncu -u && npm i",
+    "ncu": "ncu -u && npm update && npm i",
     "lint-serve": "npm run format && npm run lint && npm run build && npm run serve",
     "copy:draco:src": "copyfiles --flat ./node_modules/three/examples/jsm/libs/draco/** ./src/draco"
   },
@@ -27,23 +27,23 @@
   "homepage": "https://github.com/Rabbid76/threejs-render-poc-2#readme",
   "devDependencies": {
     "@types/dat.gui": "0.7.13",
-    "@types/node": "^22.13.8",
-    "@types/three": "^0.174.0",
-    "@typescript-eslint/eslint-plugin": "^8.25.0",
-    "@typescript-eslint/parser": "^8.25.0",
+    "@types/node": "^22.14.0",
+    "@types/three": "^0.175.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.2",
-    "eslint-plugin-prettier": "^5.2.3",
-    "npm-check-updates": "^17.1.15",
-    "prettier": "^3.5.2",
-    "typescript": "^5.7.3",
-    "vite": "^6.2.0",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "npm-check-updates": "^17.1.16",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "vite": "^6.2.5",
     "vite-plugin-static-copy": "^2.3.0"
   },
   "dependencies": {
     "dat.gui": "0.7.9",
-    "three": "^0.174.0",
+    "three": "^0.175.0",
     "three-gpu-pathtracer": "^0.0.23"
   }
 }

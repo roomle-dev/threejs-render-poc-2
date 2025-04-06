@@ -70,8 +70,8 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
     const groundMaterial = this._shadowPlaneParameters.usePhysicalMaterial
       ? new MeshPhysicalMaterial({
           color: 0xffffff,
-          metalness: 0.0,
-          roughness: 0.2,
+          metalness: 0.2,
+          roughness: 0.3,
           reflectivity: 1.0,
           clearcoat: 0.7,
           sheen: 1.0,
