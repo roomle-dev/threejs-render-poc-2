@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-
 export default defineConfig({
   root: 'src',
   base: './',
@@ -13,9 +12,9 @@ export default defineConfig({
       targets: [
         {
           src: './draco/*',
-          dest: 'draco'
-        }
-      ]
-    })
-  ]
+          dest: 'draco',
+        },
+      ],
+    }),
+  ],
 });

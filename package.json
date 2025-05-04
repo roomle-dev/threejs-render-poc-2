@@ -11,7 +11,8 @@
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "ncu": "ncu -u && npm update && npm i",
     "lint-serve": "npm run format && npm run lint && npm run build && npm run serve",
-    "copy:draco:src": "copyfiles --flat ./node_modules/three/examples/jsm/libs/draco/** ./src/draco"
+    "copy:draco:src": "copyfiles --flat ./node_modules/three/examples/jsm/libs/draco/** ./src/draco",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -32,9 +33,10 @@
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "copyfiles": "^2.4.1",
-    "eslint": "^9.25.1",
+    "eslint": "^9.26.0",
     "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-prettier": "^5.3.1",
+    "gh-pages": "6.3.0",
     "npm-check-updates": "^18.0.1",
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
