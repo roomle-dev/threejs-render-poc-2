@@ -9,7 +9,6 @@ import { setupDragDrop } from './util/drag-target';
 import {
   getNameFromResourceName,
   roomleSceneFactory,
-  rotatingCubeFactory,
 } from './scene/scene-factories';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
@@ -120,12 +119,16 @@ const settings = {
 
 interface UrlParameters {
   type: string;
+  id: string;
 }
 
 const queryString = window.location.search;
 const urlSearchParams = new URLSearchParams(queryString);
 const urlParameters: UrlParameters = {
   type: (urlSearchParams.get('type') as string | undefined) ?? 'webgpu',
+  id:
+    (urlSearchParams.get('id') as string | undefined) ??
+    'usm:frame:9C4BC73D19BAAD07675CDDEA721F493BB126939392FF80318204B089BD55C71A',
 };
 const container = document.getElementById('container') as HTMLDivElement;
 
@@ -137,7 +140,11 @@ const renderScene = async (
   const dracoLoader = newDracoLoader();
   const sceneCache = new SceneCache(dracoLoader, undefined, () => {});
   const cameraControl = newCameraControl(container, renderer);
-  const sceneFactory = rotatingCubeFactory(urlParameters.type);
+  const sceneFactory = roomleSceneFactory(
+    urlParameters.type,
+    urlParameters.id,
+    sceneCache
+  );
   const sceneObject = await renderer.createNewScene(sceneFactory);
   if (
     urlParameters.type === 'webgpu' ||
@@ -197,7 +204,6 @@ const renderScene = async (
   const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
   loadNewResource(getRandomItem(environmentMaps));
-  loadNewGlbScene(getRandomItem(glbUrls));
 };
 
 const setStatus = (

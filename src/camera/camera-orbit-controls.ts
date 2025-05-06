@@ -1,5 +1,5 @@
 import { CameraControl } from './camera-control';
-import { Camera } from 'three/webgpu';
+import { Camera, MathUtils } from 'three/webgpu';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export class CameraOrbitControls implements CameraControl {
@@ -13,6 +13,8 @@ export class CameraOrbitControls implements CameraControl {
       this._baseCamera.camera,
       domElement
     );
+    this._orbitControls.minPolarAngle = MathUtils.degToRad(0);
+    this._orbitControls.maxPolarAngle = MathUtils.degToRad(90);
     this._orbitControls.addEventListener('change', () => {
       this._onCameraChangedCallbacks.forEach((callback) => callback());
     });
