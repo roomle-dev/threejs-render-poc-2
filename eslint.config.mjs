@@ -14,7 +14,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['**/node_modules/', '**/dist/'],
+    ignores: ['**/node_modules/', '**/dist/', '**/src/roomle-threejs-loader/'],
   },
   ...compat.extends(
     'eslint:recommended',

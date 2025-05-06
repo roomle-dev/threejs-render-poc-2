@@ -6,7 +6,11 @@ import { SceneRenderer } from './renderer/scene-renderer';
 import { SceneRendererWebGPU } from './renderer/scene-renderer-webgpu';
 import { SceneRendererWebGL } from './renderer/scene-renderer-webgl';
 import { setupDragDrop } from './util/drag-target';
-import { glbSceneFactory, rotatingCubeFactory } from './scene/scene-factories';
+import {
+  getNameFromResourceName,
+  roomleSceneFactory,
+  rotatingCubeFactory,
+} from './scene/scene-factories';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
   AxesHelper,
@@ -16,7 +20,6 @@ import {
   GridHelper,
   HemisphereLight,
 } from 'three/webgpu';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
@@ -25,6 +28,7 @@ import { GUI } from 'dat.gui';
 import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 import { PathTraceDefaultLightFactory } from './scene/path-trace-default-light-factory';
 import { SceneObject } from './scene/scene-factory';
+import { SceneCache } from './roomle-threejs-loader/src/scene/scene-cache';
 
 const khronosAssetsUrl =
   'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/refs/heads/main/Models/';
@@ -95,20 +99,6 @@ const environmentMaps = [
   ),
 ];
 
-const getNameFromResourceName = (id: string): string => {
-  const extensions = ['glb', 'gltf', 'hdr', 'exr'];
-  let lastIndex = -1;
-  for (const extension of extensions) {
-    lastIndex = id.lastIndexOf('.' + extension);
-    if (lastIndex !== -1) {
-      break;
-    }
-  }
-  const name = id.substring(0, lastIndex);
-  const parts = name.split('/');
-  return `${parts[parts.length - 1]}`;
-};
-
 glbUrls.sort((a: string, b: string) => {
   return getNameFromResourceName(a).localeCompare(getNameFromResourceName(b));
 });
@@ -144,6 +134,8 @@ const renderScene = async (
   urlParameters: UrlParameters
 ) => {
   const renderer = await newRenderer(urlParameters.type, container);
+  const dracoLoader = newDracoLoader();
+  const sceneCache = new SceneCache(dracoLoader, undefined, () => {});
   const cameraControl = newCameraControl(container, renderer);
   const sceneFactory = rotatingCubeFactory(urlParameters.type);
   const sceneObject = await renderer.createNewScene(sceneFactory);
@@ -156,11 +148,10 @@ const renderScene = async (
     renderer.addEffects(new WebGLPathTracerEffect());
   }
 
-  const gbLoader = newGlbLoader();
   const exrLoader = new EXRLoader();
   const rgbeLoader = new RGBELoader();
   const loadNewGlbScene = (resource: string) =>
-    loadGlb(renderer, resource, gbLoader, sceneObject);
+    loadGlb(renderer, resource, sceneCache, sceneObject);
   const loadResource = (
     resourceName: string,
     resource: string | ArrayBuffer | null | undefined
@@ -333,25 +324,23 @@ const loadHdr = (
   );
 };
 
-const newGlbLoader = (): GLTFLoader => {
-  const gbLoader = new GLTFLoader();
+const newDracoLoader = (): DRACOLoader => {
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('./draco/');
   dracoLoader.setDecoderConfig({ type: 'wasm' });
-  gbLoader.setDRACOLoader(dracoLoader);
-  return gbLoader;
+  return dracoLoader;
 };
 
 const loadGlb = async (
   renderer: SceneRenderer,
   resource: string,
-  gbLoader: GLTFLoader,
+  sceneCache: SceneCache,
   scneeObject: SceneObject
 ) => {
-  const newSceneFactory = glbSceneFactory(
+  const newSceneFactory = roomleSceneFactory(
     urlParameters.type,
     resource,
-    gbLoader
+    sceneCache
   );
   renderer.createNewScene(newSceneFactory).then((newSceneObject) => {
     scneeObject.objects.length = 0;

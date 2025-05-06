@@ -4,15 +4,15 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 export class GlbSceneFactory implements SceneFactory {
   private _resource: string;
-  private _gbLoader: GLTFLoader;
+  private _glbLoader: GLTFLoader;
 
-  constructor(resource: string, gbLoader: GLTFLoader) {
+  constructor(resource: string, glbLoader: GLTFLoader) {
     this._resource = resource;
-    this._gbLoader = gbLoader;
+    this._glbLoader = glbLoader;
   }
 
   async create(): Promise<SceneObject> {
-    const glb = await this._gbLoader.loadAsync(this._resource);
+    const glb = await this._glbLoader.loadAsync(this._resource);
     glb.scene.traverse((child) => {
       if (child instanceof Mesh) {
         if (child.material instanceof MeshStandardMaterial) {
