@@ -18,7 +18,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-import { TslEffectsTest } from './renderer/tsl-effects-test';
+import { TslEffects } from './renderer/tsl-effects';
 import { GUI } from 'dat.gui';
 import { WebGLPathTracerEffect } from './renderer/webgl-path-tracer-effect';
 import { PathTraceDefaultLightFactory } from './scene/path-trace-default-light-factory';
@@ -132,7 +132,7 @@ interface UrlParameters {
 const queryString = window.location.search;
 const urlSearchParams = new URLSearchParams(queryString);
 const urlParameters: UrlParameters = {
-  type: (urlSearchParams.get('type') as string | undefined) ?? 'webgl',
+  type: (urlSearchParams.get('type') as string | undefined) ?? 'webgpu',
 };
 const container = document.getElementById('container') as HTMLDivElement;
 
@@ -148,7 +148,7 @@ const renderScene = async (
     urlParameters.type === 'webgpu' ||
     urlParameters.type === 'webgpu-forcewebgl'
   ) {
-    renderer.addEffects(new TslEffectsTest());
+    renderer.addEffects(new TslEffects());
   } else if (urlParameters.type === 'webgl') {
     renderer.addEffects(new WebGLPathTracerEffect());
   }
