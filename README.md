@@ -1,8 +1,8 @@
 # three.js render PoC 2
 
-[WebGPU demo](https://rabbid76.github.io/threejs-render-poc-2/?type=webgpu)
+[WebGPU demo](https://roomle-dev.github.io/threejs-render-poc-2/?type=webgpu)
 
-[WebGL Path Tracer demo](https://rabbid76.github.io/threejs-render-poc-2/?type=webgl)
+[WebGL Path Tracer demo](https://roomle-dev.github.io/threejs-render-poc-2/?type=webgl)
 
 ## Install and build
 
