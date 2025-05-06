@@ -14,6 +14,14 @@ export default defineConfig({
           src: './draco/*',
           dest: 'draco',
         },
+        {
+          src: '../node_modules/roomle-core-hsc/wasm_modern/ConfiguratorKernel.wasm',
+          dest: '.',
+        },
+        {
+          src: '../node_modules/roomle-core-hsc/wasm_modern/RoomleCore.wasm',
+          dest: '.',
+        },
       ],
     }),
   ],

@@ -10,6 +10,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,html,css}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "ncu": "ncu -u && npm update && npm i",
+    "update:submodules": "git submodule update",
     "lint-serve": "npm run format && npm run lint && npm run build && npm run serve",
     "copy:draco:src": "copyfiles --flat ./node_modules/three/examples/jsm/libs/draco/** ./src/draco",
     "deploy": "gh-pages -d dist"
@@ -45,6 +46,7 @@
   },
   "dependencies": {
     "dat.gui": "0.7.9",
+    "roomle-core-hsc": "https://www.roomle.com/t/external/core/alpha/2.50.0-alpha.12/hsc.tar.gz",
     "three": "^0.176.0",
     "three-gpu-pathtracer": "^0.0.23"
   }
