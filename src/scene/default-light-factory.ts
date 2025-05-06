@@ -13,6 +13,8 @@ export class DefaultLightFactory implements LightFactory {
     lightSource.shadow.camera.near = 50;
     lightSource.shadow.camera.far = 300;
     lightSource.shadow.camera.lookAt(0, 0, 0);
+    //lightSource.shadow.bias = -0.00005;
+    lightSource.shadow.normalBias = 0.05;
     return Promise.resolve([environmentLight, lightSource]);
   }
 }

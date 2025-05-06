@@ -4,6 +4,7 @@ import {
   Camera,
   Color,
   NeutralToneMapping,
+  PCFSoftShadowMap,
   Scene,
   Texture,
   WebGPURenderer,
@@ -31,6 +32,7 @@ export abstract class SceneRenderer {
     this._renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this._renderer.domElement);
     this._renderer.shadowMap.enabled = true;
+    this._renderer.shadowMap.type = PCFSoftShadowMap;
     this._scene = new Scene();
   }
 
