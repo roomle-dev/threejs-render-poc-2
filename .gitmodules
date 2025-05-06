@@ -1,0 +1,3 @@
+[submodule "src/roomle-threejs-loader"]
+	path = src/roomle-threejs-loader
+	url = https://github.com/roomle-dev/roomle-threejs-loader.git

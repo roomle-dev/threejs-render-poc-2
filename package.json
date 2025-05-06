@@ -10,7 +10,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx,html,css}'",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "ncu": "ncu -u && npm update && npm i",
-    "update:submodules": "git submodule update",
+    "update:submodules": "git submodule update --init --recursive",
     "lint-serve": "npm run format && npm run lint && npm run build && npm run serve",
     "copy:draco:src": "copyfiles --flat ./node_modules/three/examples/jsm/libs/draco/** ./src/draco",
     "deploy": "gh-pages -d dist"
