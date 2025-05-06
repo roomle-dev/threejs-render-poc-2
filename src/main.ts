@@ -9,9 +9,11 @@ import { setupDragDrop } from './util/drag-target';
 import { glbSceneFactory, rotatingCubeFactory } from './scene/scene-factories';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import {
+  AxesHelper,
   Color,
   DataTexture,
   EquirectangularReflectionMapping,
+  GridHelper,
   HemisphereLight,
 } from 'three/webgpu';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -123,6 +125,7 @@ function getRandomItem<T>(array: T[]): T {
 const settings = {
   glb: '',
   envMap: '',
+  'grid helper': false,
 };
 
 interface UrlParameters {
@@ -178,6 +181,15 @@ const renderScene = async (
   const loadNewResource = (resource: string) => {
     loadResource(resource, resource);
   };
+  const switchHelperVisibility = (visible: boolean) => {
+    renderer.scene.traverse((node) => {
+      if (node instanceof GridHelper) {
+        node.visible = visible;
+      } else if (node instanceof AxesHelper) {
+        node.visible = visible;
+      }
+    });
+  };
 
   setupDragDrop(
     'holder',
@@ -189,7 +201,7 @@ const renderScene = async (
 
   const stats = newStats();
   const gui = new GUI();
-  addGui(gui, urlParameters, renderer, loadNewResource);
+  addGui(gui, urlParameters, renderer, loadNewResource, switchHelperVisibility);
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
@@ -232,11 +244,13 @@ const newRenderer = async (
   }
   renderer.setSize(window.innerWidth, window.innerHeight);
   await renderer.addLights(
-    rendererType == 'webgl'
+    rendererType === 'webgl'
       ? new PathTraceDefaultLightFactory()
       : new DefaultLightFactory()
   );
-  await renderer.addHelper(new AxisGridHelperFactory());
+  if (rendererType !== 'webgl') {
+    await renderer.addHelper(new AxisGridHelperFactory());
+  }
   return renderer;
 };
 
@@ -357,10 +371,12 @@ const addGui = (
   gui: GUI,
   urlParameters: UrlParameters,
   renderer: SceneRenderer,
-  loadNewResource: (resource: string) => void
+  loadNewResource: (resource: string) => void,
+  switchHelperVisibility: (visible: boolean) => void
 ) => {
   addGlbGui(gui, loadNewResource);
   addEnvironmentMapGui(gui, loadNewResource);
+  addHelperGui(gui, switchHelperVisibility);
   renderer.addUI(gui);
   if (urlParameters.type !== 'webgl') {
     for (const hemisphereLight of renderer.scene.children.filter(
@@ -387,6 +403,20 @@ const addEnvironmentMapGui = (
   gui.add(settings, 'envMap', getEnvironmentForUI()).onChange((value) => {
     if (value !== '') {
       loadEnvironmentMap(value);
+    }
+  });
+};
+
+const addHelperGui = (
+  gui: GUI,
+  switchHelperVisibility: (visible: boolean) => void
+) => {
+  if (urlParameters.type === 'webgl') {
+    return;
+  }
+  gui.add(settings, 'grid helper').onChange((value) => {
+    if (value !== '') {
+      switchHelperVisibility(value);
     }
   });
 };
