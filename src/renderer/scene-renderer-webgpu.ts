@@ -19,7 +19,7 @@ interface UiProperties {
 export class SceneRendererWebGPU extends SceneRenderer {
   private _uiProperties: UiProperties = {
     'enable effects': true,
-    'environment background': true,
+    'environment background': false,
   };
   private _webGpuRenderer: WebGPURenderer;
 

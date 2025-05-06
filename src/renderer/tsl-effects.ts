@@ -44,10 +44,10 @@ export class TslEffects implements RenderEffects {
   private _aoPass?: ShaderNodeObject<GTAONode>;
   private _uiProperties: UiProperties = {
     distanceExponent: 1,
-    distanceFallOff: 0.1,
-    radius: 0.1,
-    scale: 1,
-    thickness: 1,
+    distanceFallOff: 1,
+    radius: 0.05,
+    scale: 0.5,
+    thickness: 2,
     reflection: 0.5,
   };
 
@@ -127,11 +127,11 @@ export class TslEffects implements RenderEffects {
     const scenePassNormal = scenePass.getTextureNode('normal');
     const scenePassDepth = scenePass.getTextureNode('depth');
     this._aoPass = ao(scenePassDepth, scenePassNormal, camera);
-    this._aoPass.distanceExponent.value = 1;
-    this._aoPass.distanceFallOff.value = 0.1;
-    this._aoPass.radius.value = 0.1;
-    this._aoPass.scale.value = 1.5;
-    this._aoPass.thickness.value = 1;
+    this._aoPass.distanceExponent.value = this._uiProperties.distanceExponent;
+    this._aoPass.distanceFallOff.value = this._uiProperties.distanceFallOff;
+    this._aoPass.radius.value = this._uiProperties.radius;
+    this._aoPass.scale.value = this._uiProperties.scale;
+    this._aoPass.thickness.value = this._uiProperties.thickness;
     return this._aoPass.getTextureNode().mul(scenePassColor);
   }
 
@@ -199,11 +199,13 @@ export class TslEffects implements RenderEffects {
           this._aoPass.distanceFallOff.value = value;
         }
       });
-    aoFolder.add(this._uiProperties, 'radius', 0, 1, 0.01).onChange((value) => {
-      if (this._aoPass) {
-        this._aoPass.radius.value = value;
-      }
-    });
+    aoFolder
+      .add(this._uiProperties, 'radius', 0, 0.2, 0.01)
+      .onChange((value) => {
+        if (this._aoPass) {
+          this._aoPass.radius.value = value;
+        }
+      });
     aoFolder.add(this._uiProperties, 'scale', 0, 2, 0.1).onChange((value) => {
       if (this._aoPass) {
         this._aoPass.scale.value = value;

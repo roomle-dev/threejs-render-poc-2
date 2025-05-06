@@ -106,11 +106,6 @@ environmentMaps.sort((a: string, b: string) => {
   return getNameFromResourceName(a).localeCompare(getNameFromResourceName(b));
 });
 
-function getRandomItem<T>(array: T[]): T {
-  const randomIndex = Math.floor(Math.random() * array.length);
-  return array[randomIndex];
-}
-
 const settings = {
   glb: '',
   envMap: '',
@@ -203,7 +198,7 @@ const renderScene = async (
   addResizeEventListener(cameraControl, renderer);
   const animate = newAnimationLoop(renderer, cameraControl, sceneObject, stats);
   animate();
-  loadNewResource(getRandomItem(environmentMaps));
+  loadNewResource(environmentMaps[2]);
 };
 
 const setStatus = (

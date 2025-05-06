@@ -54,9 +54,9 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
   private _liftOnGround(object: Object3D): void {
     const box = new Box3().setFromObject(object);
     const log10 = Math.floor(
-      Math.log10(Math.abs(box.getSize(new Vector3()).length() / 3))
+      Math.log10(Math.abs(box.getSize(new Vector3()).length()))
     );
-    const scale = 10 ** -log10;
+    const scale = Math.max(1, 10 ** -log10);
     object.scale.multiplyScalar(scale);
     const boxCenter = box.getCenter(new Vector3());
     object.position.x -= boxCenter.x * scale;
