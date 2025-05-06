@@ -67,14 +67,14 @@ export class TslEffects implements RenderEffects {
 
   public initialize(renderer: Renderer, scene: Scene, camera: Camera) {
     this._postProcessing = new PostProcessing(renderer as Renderer);
-    const scenePass = pass(scene, camera);
-    scenePass.setMRT(
+    this._scenePass = pass(scene, camera);
+    this._scenePass.setMRT(
       mrt({
         output: output,
         normal: transformedNormalView,
       })
     );
-    const blendPassAO = this._createAO(scenePass, camera);
+    const blendPassAO = this._createAO(this._scenePass, camera);
     this._postProcessing.outputNode = this._createFxAA(blendPassAO);
   }
 
