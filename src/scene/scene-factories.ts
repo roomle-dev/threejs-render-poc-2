@@ -21,7 +21,7 @@ export const rotatingCubeFactory = (_sceneType: string): SceneFactory => {
 };
 
 export const glbSceneFactory = (
-  _sceneType: string,
+  sceneType: string,
   resource: string,
   gbLoader: GLTFLoader
 ): SceneFactory => {
@@ -29,6 +29,7 @@ export const glbSceneFactory = (
     new ShadowModifierFactory(new GlbSceneFactory(resource, gbLoader)),
     {
       usePhysicalMaterial: true,
+      useNodeMaterial: sceneType === 'webgpu',
     }
   );
   return sceneFactory;

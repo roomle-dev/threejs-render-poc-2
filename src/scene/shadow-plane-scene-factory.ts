@@ -1,10 +1,13 @@
+import { texture, uv } from 'three/tsl';
 import { newRadialFloorTexture } from '../texture/texture-factory';
 import { SceneFactory, SceneObject } from './scene-factory';
 import {
   Box3,
   Group,
+  Material,
   Mesh,
   MeshPhysicalMaterial,
+  MeshPhysicalNodeMaterial,
   Object3D,
   PlaneGeometry,
   ShadowMaterial,
@@ -13,6 +16,7 @@ import {
 
 export interface ShadowPlaneParameters {
   usePhysicalMaterial?: boolean;
+  useNodeMaterial?: boolean;
 }
 
 export class ShadowPlaneSceneFactory implements SceneFactory {
@@ -67,23 +71,39 @@ export class ShadowPlaneSceneFactory implements SceneFactory {
     groundGeometry.rotateX(-Math.PI / 2);
     // ShadowMaterial is only supported in webgl (three.js 174)
     // ShadowMaterial is all over black with webgl path tracer (three-gpu-pathtracer 0.0.23)
-    const groundMaterial = this._shadowPlaneParameters.usePhysicalMaterial
-      ? new MeshPhysicalMaterial({
-          color: 0xffffff,
-          metalness: 0.2,
-          roughness: 0.3,
-          reflectivity: 1.0,
-          clearcoat: 0.7,
-          sheen: 1.0,
-          transparent: true,
-          map: newRadialFloorTexture(1024, 0.5),
-        })
-      : new ShadowMaterial();
+    let groundMaterial: Material;
+    if (this._shadowPlaneParameters.useNodeMaterial) {
+      const nodeMaterial = new MeshPhysicalNodeMaterial({
+        color: 0xffffff,
+        metalness: 0.2,
+        roughness: 0.3,
+        clearcoat: 0.7,
+        sheen: 1.0,
+        transparent: true,
+      });
+      nodeMaterial.colorNode = texture(newRadialFloorTexture(1024, 0.5), uv());
+      groundMaterial = nodeMaterial;
+    } else if (this._shadowPlaneParameters.usePhysicalMaterial) {
+      groundMaterial = new MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0.2,
+        roughness: 0.3,
+        reflectivity: 1.0,
+        clearcoat: 0.7,
+        sheen: 1.0,
+        transparent: true,
+        map: newRadialFloorTexture(1024, 0.5),
+      });
+    } else {
+      groundMaterial = new ShadowMaterial();
+    }
     groundMaterial.polygonOffset = true;
     groundMaterial.polygonOffsetFactor = 4;
     groundMaterial.polygonOffsetUnits = 4;
     const groundMesh = new Mesh(groundGeometry, groundMaterial);
     groundMesh.receiveShadow = true;
+    groundMesh.name = 'ground';
+    groundMesh.userData.groundForReflection = true;
     return groundMesh;
   }
 }

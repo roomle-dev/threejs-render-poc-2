@@ -1,18 +1,26 @@
 import { RenderEffects } from './render-effects';
 import {
   Camera,
+  Mesh,
+  MeshPhysicalNodeMaterial,
   PassNode,
   PostProcessing,
+  ReflectorNode,
+  ReflectorNodeParameters,
   Renderer,
   Scene,
+  TextureNode,
+  UniformNode,
 } from 'three/webgpu';
 import {
   mrt,
   NodeRepresentation,
   output,
   pass,
+  reflector,
   ShaderNodeObject,
   transformedNormalView,
+  uniform,
 } from 'three/tsl';
 import GTAONode, { ao } from 'three/examples/jsm/tsl/display/GTAONode.js';
 import FXAANode, { fxaa } from 'three/examples/jsm/tsl/display/FXAANode.js';
@@ -24,12 +32,15 @@ interface UiProperties {
   radius: number;
   scale: number;
   thickness: number;
+  reflection: number;
 }
 
 // https://tympanus.net/codrops/2024/10/30/interactive-3d-with-three-js-batchedmesh-and-webgpurenderer/
 export class TslEffects implements RenderEffects {
   private _postProcessing?: PostProcessing;
+  private _effectController: Map<string, NodeRepresentation> = new Map();
   private _scenePass?: ShaderNodeObject<PassNode>;
+  private _groundReflection?: ShaderNodeObject<ReflectorNode>;
   private _aoPass?: ShaderNodeObject<GTAONode>;
   private _uiProperties: UiProperties = {
     distanceExponent: 1,
@@ -37,6 +48,7 @@ export class TslEffects implements RenderEffects {
     radius: 0.1,
     scale: 1,
     thickness: 1,
+    reflection: 0.5,
   };
 
   get isValid(): boolean {
@@ -66,6 +78,47 @@ export class TslEffects implements RenderEffects {
     this._postProcessing.outputNode = this._createFxAA(blendPassAO);
   }
 
+  private _createGroundReflection(scene: Scene) {
+    const reflectionPlane = this._findReflectionPlane(scene);
+    if (!reflectionPlane) {
+      return;
+    }
+    if (!(reflectionPlane.material instanceof MeshPhysicalNodeMaterial)) {
+      return;
+    }
+    const reflectionMaterial =
+      reflectionPlane.material as MeshPhysicalNodeMaterial;
+    if (!reflectionMaterial.colorNode) {
+      return;
+    }
+    const reflectionUniform = uniform(this._uiProperties.reflection);
+    this._effectController.set('reflection', reflectionUniform);
+    const prams: ReflectorNodeParameters = {
+      resolution: 0.5,
+      bounces: false,
+      generateMipmaps: false,
+    };
+    this._groundReflection?.dispose();
+    this._groundReflection = reflector(prams);
+    this._groundReflection.target.rotateX(-Math.PI / 2);
+    const groundReflectionColor =
+      reflectionMaterial.colorNode as ShaderNodeObject<TextureNode>;
+    reflectionMaterial.colorNode = groundReflectionColor.add(
+      groundReflectionColor.mul(this._groundReflection).mul(reflectionUniform)
+    );
+    scene.add(this._groundReflection.target);
+  }
+
+  private _findReflectionPlane(scene: Scene): Mesh | null {
+    let groundForReflection: Mesh | null = null;
+    scene.traverse((node) => {
+      if (node instanceof Mesh && node.userData?.groundForReflection) {
+        groundForReflection = node;
+      }
+    });
+    return groundForReflection;
+  }
+
   private _createAO(
     scenePass: ShaderNodeObject<PassNode>,
     camera: Camera
@@ -92,6 +145,9 @@ export class TslEffects implements RenderEffects {
     if (!this._postProcessing) {
       this.initialize(renderer, scene, camera);
     }
+    if (this._postProcessing) {
+      this._createGroundReflection(scene);
+    }
     if (this._scenePass) {
       this._scenePass.scene = scene;
       this._scenePass.camera = camera;
@@ -110,7 +166,9 @@ export class TslEffects implements RenderEffects {
     _renderer: Renderer,
     _scene: Scene,
     _camera: Camera
-  ): void {}
+  ): void {
+    // nothing to do
+  }
 
   public updateLights(
     _renderer: Renderer,
@@ -156,6 +214,17 @@ export class TslEffects implements RenderEffects {
       .onChange((value) => {
         if (this._aoPass) {
           this._aoPass.thickness.value = value;
+        }
+      });
+    const reflectionFolder = gui.addFolder('ground reflection');
+    reflectionFolder
+      .add(this._uiProperties, 'reflection', 0, 1, 0.01)
+      .onChange((value) => {
+        if (this._effectController.has('reflection')) {
+          const reflectionUniform = this._effectController.get(
+            'reflection'
+          ) as ShaderNodeObject<UniformNode<number>>;
+          reflectionUniform.value = value;
         }
       });
   }
